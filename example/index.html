@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>chrome-ai</title>
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
   </head>
   <body>
     <main>
@@ -26,34 +25,12 @@
         const { textStream } = await streamText({
           model: chromeai('text'),
           prompt: input.value,
-          // temperature: 1,
-          topK: 5,
         });
 
         for await (const textPart of textStream) {
           result.textContent = textPart;
         }
       };
-
-      // import { z } from 'https://esm.sh/zod';
-
-      // const { object } = await generateObject({
-      //   model: chromeai('text'),
-      //   schema: z.object({
-      //     recipe: z.object({
-      //       name: z.string(),
-      //       ingredients: z.array(
-      //         z.object({
-      //           name: z.string(),
-      //           amount: z.string(),
-      //         })
-      //       ),
-      //       steps: z.array(z.string()),
-      //     }),
-      //   }),
-      //   prompt: 'Generate a lasagna recipe.',
-      // });
-      // console.log(object);
     </script>
   </body>
 </html>

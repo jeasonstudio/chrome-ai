@@ -142,9 +142,8 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
     // FIXME: something tricky here
     if (this.magicPrompts[options.mode.type]) {
       prompt = [
-        prompt[0],
         { role: 'system', content: this.magicPrompts[options.mode.type]! },
-        prompt[1],
+        ...prompt,
       ];
     }
 
