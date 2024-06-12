@@ -1,6 +1,6 @@
 {
   "name": "chrome-ai",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "exports": {
