@@ -161,14 +161,14 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   public doGenerate = async (
     options: LanguageModelV1CallOptions
   ): Promise<{
-    text?: string | undefined;
-    toolCalls?: LanguageModelV1FunctionToolCall[] | undefined;
+    text?: string;
+    toolCalls?: LanguageModelV1FunctionToolCall[];
     finishReason: LanguageModelV1FinishReason;
     usage: { promptTokens: number; completionTokens: number };
     rawCall: { rawPrompt: unknown; rawSettings: Record<string, unknown> };
-    rawResponse?: { headers?: Record<string, string> | undefined } | undefined;
-    warnings?: LanguageModelV1CallWarning[] | undefined;
-    logprobs?: LanguageModelV1LogProbs | undefined;
+    rawResponse?: { headers?: Record<string, string> };
+    warnings?: LanguageModelV1CallWarning[];
+    logprobs?: LanguageModelV1LogProbs;
   }> => {
     const session = await this.getSession({ temperature: options.temperature });
     const message = this.formatMessages(options);
@@ -188,8 +188,8 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   ): Promise<{
     stream: ReadableStream<LanguageModelV1StreamPart>;
     rawCall: { rawPrompt: unknown; rawSettings: Record<string, unknown> };
-    rawResponse?: { headers?: Record<string, string> | undefined } | undefined;
-    warnings?: LanguageModelV1CallWarning[] | undefined;
+    rawResponse?: { headers?: Record<string, string> };
+    warnings?: LanguageModelV1CallWarning[];
   }> => {
     const session = await this.getSession({ temperature: options.temperature });
     const message = this.formatMessages(options);

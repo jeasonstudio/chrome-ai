@@ -25,10 +25,13 @@
     "debug": "^4.3.5"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.12",
     "@ai-sdk/provider-utils": "^0.0.13",
+    "@types/debug": "^4.1.12",
+    "@vitest/coverage-v8": "^1.6.0",
     "ai": "^3.1.31",
     "tsup": "^8.1.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0",
+    "zod": "^3.23.8"
   }
 }
