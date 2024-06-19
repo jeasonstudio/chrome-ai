@@ -4,7 +4,7 @@
 
 ## Enable AI in Chrome
 
-Chrome built-in AI is a preview feature, you need to use chrome version 127 or greater, now in [dev](https://www.google.com/chrome/dev/?platform=mac&extra=devchannel) or [canary](https://www.google.com/chrome/canary/?platform=mac) channel, [may release on stable chanel at Jun 17, 2024](https://chromestatus.com/roadmap), if release schedule on time.
+Chrome built-in AI is a preview feature, you need to use chrome version 127 or greater, now in [dev](https://www.google.com/chrome/dev/?platform=mac&extra=devchannel) or [canary](https://www.google.com/chrome/canary/?platform=mac) channel, [may release on stable chanel at Jul 17, 2024](https://chromestatus.com/roadmap), if release schedule on time.
 
 After then, you should turn on these flags:
 * [chrome://flags/#prompt-api-for-gemini-nano](chrome://flags/#prompt-api-for-gemini-nano): `Enabled`
