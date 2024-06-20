@@ -1,6 +1,48 @@
-# Chrome AI
+<div align="center">
+<a name="readme-top"></a>
 
-`jeasonstudio/chrome-ai` is a community provider that uses Chrome built-in AI to provide language model. It works fine with vercel `ai`.
+<h1>Chrome AI</h1>
+
+[Vercel AI](https://sdk.vercel.ai/docs/introduction) provider for Chrome built-in model (Gemini Nano).
+
+[![NPM version][npm-image]][npm-url]
+[![NPM downloads][download-image]][download-url]
+[![Stargazers][stars-shield]][stars-url]
+[![MIT License][license-shield]][license-url]
+
+[![CI status][github-action-image]][github-action-url]
+[![codecov][codecov-image]][codecov-url]
+[![Follow Twitter][twitter-image]][twitter-url]
+
+[Report Bug](https://github.com/jeasonstudio/chrome-ai/issues/new) · [Pull Request](https://github.com/jeasonstudio/chrome-ai/compare)
+
+![](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
+
+[npm-image]: https://img.shields.io/npm/v/chrome-ai?style=for-the-badge
+[npm-url]: http://npmjs.org/package/chrome-ai
+[download-image]: https://img.shields.io/npm/dm/chrome-ai.svg?style=for-the-badge
+[download-url]: https://npmjs.org/package/chrome-ai
+[github-action-image]: https://img.shields.io/github/actions/workflow/status/jeasonstudio/chrome-ai/ci.yml?style=for-the-badge
+[github-action-url]: https://github.com/jeasonstudio/chrome-ai/actions?query=workflow=%22ci%22
+[codecov-image]: https://img.shields.io/codecov/c/github/jeasonstudio/chrome-ai/main.svg?style=for-the-badge
+[codecov-url]: https://codecov.io/gh/jeasonstudio/chrome-ai/branch/main
+[license-shield]: https://img.shields.io/github/license/jeasonstudio/chrome-ai.svg?style=for-the-badge
+[license-url]: https://github.com/jeasonstudio/chrome-ai/blob/main/LICENSE
+
+[stars-shield]: https://img.shields.io/github/stars/jeasonstudio/chrome-ai.svg?style=for-the-badge
+[stars-url]: https://github.com/jeasonstudio/chrome-ai/stargazers
+[issues-shield]: https://img.shields.io/github/issues/jeasonstudio/chrome-ai.svg?style=for-the-badge
+[issues-url]: https://github.com/jeasonstudio/chrome-ai/issues
+[twitter-image]: https://img.shields.io/twitter/follow/jeasonstudio?style=for-the-badge&logo=x
+[twitter-url]: https://twitter.com/jeasonstudio
+
+</div>
+
+## Installation
+
+```bash
+$ npm i ai chrome-ai
+```
 
 ## Enable AI in Chrome
 
@@ -13,12 +55,6 @@ After then, you should turn on these flags:
 Then click `Optimization Guide On Device Model` in [chrome://components/](chrome://components/) to download model.
 
 Finally, you can use prompt api in console, or use `chrome-ai` with `vercel/ai` to build projects.
-
-## Install
-
-```bash
-npm install chrome-ai ai
-```
 
 ## Usage
 

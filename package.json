@@ -1,5 +1,6 @@
 {
   "name": "chrome-ai",
+  "description": "Vercel AI provider for Chrome built-in model (Gemini Nano)",
   "version": "1.1.2",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -19,15 +20,13 @@
   "files": [
     "dist"
   ],
-  "author": "jeason.eth <me@cowpoke.cc>",
+  "author": "jeasonstudio <me@cowpoke.cc>",
   "license": "MIT",
-  "description": "",
   "dependencies": {
     "@ai-sdk/provider": "^0.0.10",
     "debug": "^4.3.5"
   },
   "devDependencies": {
-    "@ai-sdk/provider-utils": "^0.0.13",
     "@types/debug": "^4.1.12",
     "@vitest/coverage-v8": "^1.6.0",
     "ai": "^3.1.31",

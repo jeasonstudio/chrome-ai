@@ -3,7 +3,7 @@ on:
   - pull_request
 
 jobs:
-  unit-test-and-lint:
+  build-and-test-coverage:
     runs-on: ubuntu-latest
 
     steps:
