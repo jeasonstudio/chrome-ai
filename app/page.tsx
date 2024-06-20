@@ -34,7 +34,6 @@ const HomePage: React.FC<unknown> = () => {
       setLoading(false);
       const cost = Date.now() - startTimestamp;
       console.log('cost:', cost, 'ms');
-      console.log('result:', result);
     } catch (error) {
       setLoading(false);
       setError((error as any).message);
@@ -69,7 +68,7 @@ const HomePage: React.FC<unknown> = () => {
             </div>
             <div className="z-10 m-auto flex w-full flex-col overflow-hidden sm:max-w-xl">
               <PromptCard onPrompt={onPrompt} />
-              <div className="pt-4">
+              <div className="pt-8">
                 <ChatCard message={result} loading={loading} />
                 {error && (
                   <Alert variant="destructive">
