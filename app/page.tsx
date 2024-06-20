@@ -1,42 +1,89 @@
 'use client';
 
-import { useTheme } from 'next-themes';
+import Image from 'next/image';
 import React from 'react';
 
+import { streamText } from 'ai';
+import { chromeai } from 'chrome-ai';
+import { z } from 'zod';
+import { PromptCard } from './components/prompt-card';
+import { ChatCard } from './components/chat-card';
+import { Alert, AlertDescription, AlertTitle } from './components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { Footer } from './components/footer';
+import { checkEnv } from './utils';
+
+const model = chromeai();
+
 const HomePage: React.FC<unknown> = () => {
+  const [result, setResult] = React.useState<string | undefined>(undefined);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | undefined>(undefined);
+
+  const onPrompt = async (prompt: string) => {
+    try {
+      await checkEnv();
+      setResult(undefined);
+      setError(undefined);
+      setLoading(true);
+      const startTimestamp = Date.now();
+      const { textStream } = await streamText({ model, prompt });
+      for await (const textPart of textStream) {
+        setResult(textPart);
+      }
+      setLoading(false);
+      const cost = Date.now() - startTimestamp;
+      console.log('cost:', cost, 'ms');
+      console.log('result:', result);
+    } catch (error) {
+      setLoading(false);
+      setError((error as any).message);
+    }
+  };
+
   return (
     <div className="relative flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 max-w-screen-2xl items-center">
-          <div className="mr-4 hidden md:flex">
-            <a className="mr-6 flex items-center space-x-2" href="/">
-              <span className="hidden font-bold sm:inline-block">
-                Chainboard
-              </span>
-            </a>
-            <nav className="flex items-center gap-4 text-sm lg:gap-6">
-              <a
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
-                href="/docs"
-              >
-                Docs
-              </a>
-            </nav>
+      <main className="container mx-auto grid gap-8 grid-cols-1">
+        <div className="relative mb-4 flex items-center justify-center py-[26vh] pt-[18vh] sm:pt-[26vh]">
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            <div className="relative mb-72 h-full w-full min-w-[29rem] max-w-[96rem] sm:mb-0">
+              <Image
+                alt="background"
+                data-nimg="fill"
+                width="0"
+                height="0"
+                className="pointer-events-none absolute inset-0 -z-10 -translate-x-2 select-none sm:translate-x-0 h-full w-full dark:hidden"
+                src="https://v0.dev/v0-background.svg"
+              />
+            </div>
           </div>
-          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-            <nav className="flex items-center">
-              {/* <ThemeSwitcher className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 py-2 w-9 px-0" /> */}
-            </nav>
+          <div className="relative flex w-full flex-col items-center gap-6 px-6">
+            <div className="flex w-full flex-col items-center gap-1.5">
+              <h2
+                className="text-4xl font-semibold tracking-tighter sm:text-5xl [@media(max-width:480px)]:text-[2rem]"
+                data-testid="home-h2"
+              >
+                Chrome AI
+              </h2>
+              <p>Vercel AI provider for Chrome built-in model (Gemini Nano)</p>
+            </div>
+            <div className="z-10 m-auto flex w-full flex-col overflow-hidden sm:max-w-xl">
+              <PromptCard onPrompt={onPrompt} />
+              <div className="pt-4">
+                <ChatCard message={result} loading={loading} />
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </header>
-
-      <main className="container mx-auto grid gap-8 grid-cols-1">
-        <p className="leading-7 [&:not(:first-child)]:mt-6">
-          The shareable on-chain notebook
-        </p>
-        <div className="h-[800px]"></div>
       </main>
+      <Footer />
     </div>
   );
 };

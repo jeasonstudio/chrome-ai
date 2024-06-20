@@ -3,7 +3,8 @@
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "chrome-ai": ["./src/index.ts"]
     },
     "incremental": true
   },
