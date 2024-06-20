@@ -10,11 +10,16 @@
       "require": "./dist/index.js"
     }
   },
+  "sideEffects": false,
   "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup",
+    "dev": "tsup --tsconfig=tsconfig.tsup.json --watch",
+    "build": "tsup --tsconfig=tsconfig.tsup.json",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
+    "ui:add": "shadcn-ui add --overwrite",
+    "demo": "next dev",
+    "demo:build": "next build",
+    "lint": "next lint",
     "prepublishOnly": "npm run build"
   },
   "files": [
@@ -28,10 +33,28 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "@vitest/coverage-v8": "^1.6.0",
     "ai": "^3.1.31",
+    "autoprefixer": "^10.4.19",
+    "clsx": "^2.1.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8.4.38",
+    "lucide-react": "^0.383.0",
+    "next": "14.2.3",
+    "next-themes": "^0.3.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "shadcn-ui": "^0.8.0",
+    "tailwindcss": "^3.4.3",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7",
     "tsup": "^8.1.0",
-    "typescript": "^5.4.5",
+    "typescript": "^5",
+    "vercel": "^34.2.5",
     "vitest": "^1.6.0",
     "zod": "^3.23.8"
   }
