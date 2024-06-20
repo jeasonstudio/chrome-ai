@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { chromeai, ChromeAIChatLanguageModel } from './language-model';
+import { chromeai, ChromeAIChatLanguageModel } from './index';
 import { generateText, streamText, generateObject } from 'ai';
-import { LoadSettingError } from '@ai-sdk/provider';
+import {
+  LoadSettingError,
+  UnsupportedFunctionalityError,
+} from '@ai-sdk/provider';
 import { z } from 'zod';
 
 describe('chrome-ai', () => {
@@ -104,5 +107,45 @@ describe('chrome-ai', () => {
     });
 
     expect(object).toMatchObject({ hello: 'world' });
+  });
+
+  it('should throw when tool call', async () => {
+    const prompt = vi.fn(async (prompt: string) => prompt);
+    vi.stubGlobal('ai', {
+      canCreateGenericSession: vi.fn(async () => 'readily'),
+      defaultGenericSessionOptions: vi.fn(async () => ({})),
+      createGenericSession: vi.fn(async () => ({ prompt })),
+    });
+    await expect(() =>
+      generateText({
+        model: chromeai(),
+        messages: [
+          {
+            role: 'tool',
+            content: [
+              {
+                type: 'tool-result',
+                toolCallId: '1',
+                toolName: 'test',
+                result: null,
+              },
+            ],
+          },
+        ],
+      })
+    ).rejects.toThrowError(UnsupportedFunctionalityError);
+
+    const model = new ChromeAIChatLanguageModel('generic', { temperature: 1 });
+    (model as any).session = { prompt };
+    const result = await generateText({
+      model,
+      messages: [
+        {
+          role: 'user',
+          content: [],
+        },
+      ],
+    });
+    expect(result.text).toBe('user:\n\n\nmodel:\n');
   });
 });

@@ -1,8 +1,8 @@
 {
   "name": "chrome-ai",
   "version": "1.1.2",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -10,12 +10,14 @@
     }
   },
   "scripts": {
+    "dev": "tsup --watch",
     "build": "tsup",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist",
-    "example"
+    "dist"
   ],
   "author": "jeason.eth <me@cowpoke.cc>",
   "license": "MIT",

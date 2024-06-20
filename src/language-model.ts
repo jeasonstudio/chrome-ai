@@ -13,6 +13,7 @@ import {
   LanguageModelV1ToolCallPart,
   LanguageModelV1ToolResultPart,
   LoadSettingError,
+  UnsupportedFunctionalityError,
 } from '@ai-sdk/provider';
 import { ChromeAISession, ChromeAISessionOptions } from './global';
 import createDebug from 'debug';
@@ -61,12 +62,11 @@ function getStringContent(
   if (typeof content === 'string') {
     return content;
   } else if (Array.isArray(content) && content.length > 0) {
-    const first = content[0];
-    return first.type === 'text'
-      ? first.text
-      : first.type === 'tool-call'
-      ? first.toolName
-      : 'image';
+    const [first] = content;
+    if (first.type !== 'text') {
+      throw new UnsupportedFunctionalityError({ functionality: 'toolCall' });
+    }
+    return first.text;
   } else {
     return '';
   }
@@ -79,9 +79,12 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   readonly provider = 'gemini-nano';
   options: ChromeAIChatSettings;
 
-  constructor(modelId: ChromeAIChatModelId, options?: ChromeAIChatSettings) {
+  constructor(
+    modelId: ChromeAIChatModelId,
+    options: ChromeAIChatSettings = {}
+  ) {
     this.modelId = modelId;
-    this.options = options ?? {};
+    this.options = options;
     debug('init:', this.modelId);
   }
 
