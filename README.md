@@ -1,6 +1,8 @@
 <div align="center">
 <a name="readme-top"></a>
 
+<img src="https://mdn.alipayobjects.com/huamei_1hrimu/afts/img/A*OLMCRq2wg7cAAAAAAAAAAAAADp95AQ/original" alt="chrome-ai" width="200"/>
+
 <h1>Chrome AI</h1>
 
 [Vercel AI](https://sdk.vercel.ai/docs/introduction) provider for Chrome built-in model (Gemini Nano).
@@ -121,7 +123,7 @@ import { chromeai } from 'chrome-ai';
 import { z } from 'zod';
 
 const { object } = await generateObject({
-  model: chromeai('text'),
+  model: chromeai(),
   schema: z.object({
     recipe: z.object({
       name: z.string(),
