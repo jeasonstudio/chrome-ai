@@ -38,48 +38,69 @@
 
 </div>
 
-## Installation
+> ⚠️ Note:
+> * This module is under development and may contain errors and frequent incompatible changes.
+> * Chrome's implementation of [built-in AI with Gemini Nano](https://developer.chrome.com/docs/ai/built-in) is an experiment and will change as they test and address feedback.
+> * If you've never heard of it before, [follow these steps](#enable-ai-in-chrome) to turn on Chrome's built-in AI.
+
+## 📦 Installation
+
+The ChromeAI provider is available in the `chrome-ai` module. You can install it with:
 
 ```bash
-$ npm i ai chrome-ai
+npm install chrome-ai
 ```
 
-## Enable AI in Chrome
+## 🦄 Language Models
 
-Chrome built-in AI is a preview feature, you need to use chrome version 127 or greater, now in [dev](https://www.google.com/chrome/dev/?extra=devchannel) or [canary](https://www.google.com/chrome/canary/) channel, [may release on stable chanel at Jul 17, 2024](https://chromestatus.com/roadmap), if release schedule on time.
+The `chromeai` provider instance is a function that you can invoke to create a language model:
 
-After then, you should turn on these flags:
-* [chrome://flags/#prompt-api-for-gemini-nano](chrome://flags/#prompt-api-for-gemini-nano): `Enabled`
-* [chrome://flags/#optimization-guide-on-device-model](chrome://flags/#optimization-guide-on-device-model): `Enabled BypassPrefRequirement`
-  
-Then click `Optimization Guide On Device Model` in [chrome://components/](chrome://components/) to download model.
+```ts
+import { chromeai } from 'chrome-ai';
 
-Finally, you can use prompt api in console, or use `chrome-ai` with `vercel/ai` to build projects.
+const model = chromeai();
+```
 
-## Usage
+It automatically selects the correct model id. You can also pass additional settings in the second argument:
 
-generate text:
+```ts
+import { chromeai } from 'chrome-ai';
+
+const model = chromeai('generic', {
+  // additional settings
+  temperature: 0.5,
+  topK: 5,
+});
+```
+
+You can use the following optional settings to customize:
+
+- **modelId** `'text' | 'generic'` (default: `'generic'`)
+- **temperature** `number` (default: `0.8`)
+- **topK** `number` (default: `3`)
+
+## 🎯 Examples
+
+You can use Chrome built-in language models to generate text with the `generateText` or `streamText` function:
 
 ```javascript
 import { generateText } from 'ai';
 import { chromeai } from 'chrome-ai';
 
 const { text } = await generateText({
-  model: chromeai('text'),
+  model: chromeai(),
   prompt: 'Who are you?',
 });
 
 console.log(text); //  I am a large language model, trained by Google.
 ```
 
-stream text:
-
 ```javascript
 import { streamText } from 'ai';
 import { chromeai } from 'chrome-ai';
 
 const { textStream } = await streamText({
-  model: chromeai('text'),
+  model: chromeai(),
   prompt: 'Who are you?',
 });
 
@@ -92,7 +113,7 @@ console.log(result);
 //  I am a large language model, trained by Google.
 ```
 
-generate object:
+Chrome built-in language models can also be used in the generateObject function:
 
 ```javascript
 import { generateObject } from 'ai';
@@ -119,3 +140,18 @@ const { object } = await generateObject({
 console.log(object);
 // { recipe: {...} }
 ```
+
+> Due to model reasons, `toolCall` and `streamObject` are not supported. We are making an effort to implement these functions by prompt engineering.
+
+## Enable AI in Chrome
+
+Chrome built-in AI is a preview feature, you need to use chrome version 127 or greater, now in [dev](https://www.google.com/chrome/dev/?extra=devchannel) or [canary](https://www.google.com/chrome/canary/) channel, [may release on stable chanel at Jul 17, 2024](https://chromestatus.com/roadmap).
+
+After then, you should turn on these flags:
+* [chrome://flags/#prompt-api-for-gemini-nano](chrome://flags/#prompt-api-for-gemini-nano): `Enabled`
+* [chrome://flags/#optimization-guide-on-device-model](chrome://flags/#optimization-guide-on-device-model): `Enabled BypassPrefRequirement`
+* [chrome://components/](chrome://components/): Click `Optimization Guide On Device Model` to download the model.
+
+## License
+
+[MIT](LICENSE) License © 2024 [Jeason](https://github.com/jeasonstudio)
