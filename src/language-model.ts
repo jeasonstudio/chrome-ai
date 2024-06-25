@@ -158,7 +158,7 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
       .join('\n\n');
     debug('format prompt:', prompt);
     debug('formated message:', messages);
-    return messages + `\n\n${this.roleMap.assistant}:\n`;
+    return messages + `\n`;
   };
 
   public doGenerate = async (

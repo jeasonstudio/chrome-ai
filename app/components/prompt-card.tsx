@@ -19,6 +19,7 @@ export interface PromptCardProps {
 export const PromptCard = React.forwardRef<HTMLDivElement, PromptCardProps>(
   ({ onPrompt }, ref) => {
     const [prompt, setPrompt] = React.useState('');
+
     return (
       <div className="grid w-full gap-2" ref={ref}>
         <Textarea
@@ -26,6 +27,11 @@ export const PromptCard = React.forwardRef<HTMLDivElement, PromptCardProps>(
           placeholder="Type your message here."
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
+          onKeyDown={(event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+              onPrompt?.(prompt);
+            }
+          }}
         />
         <div className="grid w-full gap-2 grid-cols-12">
           <Select>
@@ -43,7 +49,7 @@ export const PromptCard = React.forwardRef<HTMLDivElement, PromptCardProps>(
               onPrompt?.(prompt);
             }}
           >
-            Send message
+            Send message (⌘ + ↩)
           </Button>
         </div>
       </div>

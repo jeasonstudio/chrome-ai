@@ -27,7 +27,11 @@ const HomePage: React.FC<unknown> = () => {
       setError(undefined);
       setLoading(true);
       const startTimestamp = Date.now();
-      const { textStream } = await streamText({ model, prompt });
+      const { textStream } = await streamText({
+        model,
+        prompt,
+        // temperature: 0.8,
+      });
       for await (const textPart of textStream) {
         setResult(textPart);
       }
