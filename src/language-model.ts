@@ -142,6 +142,18 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   private formatMessages = (options: LanguageModelV1CallOptions): string => {
     let prompt: LanguageModelV1Prompt = options.prompt;
 
+    // When the user supplied a prompt input, we don't transform it:
+    if (
+      options.inputFormat === 'prompt' &&
+      prompt.length === 1 &&
+      prompt[0].role === 'user' &&
+      prompt[0].content.length === 1 &&
+      prompt[0].content[0].type === 'text'
+    ) {
+      debug('formated message:', prompt[0].content[0].text);
+      return prompt[0].content[0].text;
+    }
+
     // FIXME: something tricky here
     if (this.magicPrompts[options.mode.type]) {
       prompt = [

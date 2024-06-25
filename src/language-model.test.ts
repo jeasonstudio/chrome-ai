@@ -64,7 +64,7 @@ describe('chrome-ai', () => {
     const result = await generateText({ model: chromeai(), prompt: 'test' });
     expect(result).toMatchObject({
       finishReason: 'stop',
-      text: 'user:\ntest\n',
+      text: 'test',
     });
   });
 
@@ -86,7 +86,7 @@ describe('chrome-ai', () => {
 
     const result = await streamText({ model: chromeai(), prompt: 'test' });
     for await (const textPart of result.textStream) {
-      expect(textPart).toBe('user:\ntest\n');
+      expect(textPart).toBe('test');
     }
   });
 
