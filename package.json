@@ -1,7 +1,7 @@
 {
   "name": "chrome-ai",
   "description": "Vercel AI provider for Chrome built-in model (Gemini Nano)",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "exports": {
@@ -16,16 +16,24 @@
     "build": "tsup --tsconfig=tsconfig.tsup.json",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
+    "test:ci": "vitest --run",
     "ui:add": "shadcn-ui add --overwrite",
     "demo": "next dev",
     "lint": "next lint",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "changeset": "changeset",
+    "release:prepare": "npm run lint && npm run test:ci && npm run build",
+    "release": "npm run release:prepare && changeset version && changeset publish"
   },
   "files": [
     "dist"
   ],
   "author": "jeasonstudio <me@cowpoke.cc>",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
   "dependencies": {
     "@ai-sdk/provider": "^0.0.10",
     "@radix-ui/react-dropdown-menu": "^2.1.0",
