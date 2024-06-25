@@ -1,7 +1,7 @@
 {
   "name": "chrome-ai",
   "description": "Vercel AI provider for Chrome built-in model (Gemini Nano)",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "exports": {
