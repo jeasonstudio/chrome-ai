@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { chromeai, ChromeAIChatLanguageModel } from './index';
-import { generateText, streamText, generateObject } from 'ai';
+import { generateText, streamText, generateObject, streamObject } from 'ai';
 import {
   LoadSettingError,
   UnsupportedFunctionalityError,
@@ -66,6 +66,17 @@ describe('chrome-ai', () => {
       finishReason: 'stop',
       text: 'test',
     });
+
+    const resultForMessages = await generateText({
+      model: chromeai(),
+      messages: [
+        { role: 'user', content: 'test' },
+        { role: 'assistant', content: 'assistant' },
+      ],
+    });
+    expect(resultForMessages.text).toBe(
+      'user\ntest\nmodel\nassistant\nmodel\n'
+    );
   });
 
   it('should do stream text', async () => {
@@ -146,6 +157,24 @@ describe('chrome-ai', () => {
         },
       ],
     });
-    expect(result.text).toBe('user:\n\n');
+    expect(result.text).toBe('user\n\nmodel\n');
+
+    await expect(() =>
+      generateObject({
+        model: chromeai(),
+        mode: 'grammar',
+        schema: z.object({}),
+        prompt: 'test',
+      })
+    ).rejects.toThrowError(UnsupportedFunctionalityError);
+
+    await expect(() =>
+      streamObject({
+        model: chromeai(),
+        mode: 'grammar',
+        schema: z.object({}),
+        prompt: 'test',
+      })
+    ).rejects.toThrowError(UnsupportedFunctionalityError);
   });
 });
