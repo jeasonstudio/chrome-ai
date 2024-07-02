@@ -5,7 +5,6 @@ import React from 'react';
 
 import { streamText } from 'ai';
 import { chromeai } from 'chrome-ai';
-import { z } from 'zod';
 import { PromptCard } from './components/prompt-card';
 import { ChatCard } from './components/chat-card';
 import { Alert, AlertDescription, AlertTitle } from './components/ui/alert';
@@ -13,7 +12,7 @@ import { AlertCircle } from 'lucide-react';
 import { Footer } from './components/footer';
 import { checkEnv } from './utils';
 
-const model = chromeai();
+const model = chromeai('generic');
 
 const HomePage: React.FC<unknown> = () => {
   const [result, setResult] = React.useState<string | undefined>(undefined);
@@ -29,8 +28,8 @@ const HomePage: React.FC<unknown> = () => {
       const startTimestamp = Date.now();
       const { textStream } = await streamText({
         model,
-        prompt,
-        // temperature: 0.8,
+        system: 'You are a helpful assistant.',
+        messages: [{ role: 'user', content: prompt }],
       });
       for await (const textPart of textStream) {
         setResult(textPart);
