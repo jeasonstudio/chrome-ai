@@ -2,9 +2,9 @@ import React from 'react';
 
 export const Footer: React.FC<unknown> = () => {
   return (
-    <div className="fixed bottom-4 w-full">
+    <footer className="w-full text-center">
       <p className="text-muted-foreground px-2 text-center text-xs leading-normal hidden sm:block">
-        Open source AI demo built with{' '}
+        Built with{' '}
         <a
           href="https://github.com/jeasonstudio/chrome-ai"
           target="_blank"
@@ -46,6 +46,6 @@ export const Footer: React.FC<unknown> = () => {
         </a>
         .
       </p>
-    </div>
+    </footer>
   );
 };
