@@ -1,5 +1,12 @@
 # chrome-ai
 
+## 1.6.0
+
+### Minor Changes
+
+- fd3a1d1: break: stream text now return text part
+- fd3a1d1: feat: support stream object
+
 ## 1.5.0
 
 ### Minor Changes
