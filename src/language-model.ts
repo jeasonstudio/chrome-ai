@@ -16,6 +16,7 @@ import {
 } from '@ai-sdk/provider';
 import { ChromeAISession, ChromeAISessionOptions } from './global';
 import createDebug from 'debug';
+import { StreamAI } from './stream-ai';
 
 const debug = createDebug('chromeai');
 
@@ -213,7 +214,7 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   }> => {
     debug('stream options:', options);
 
-    if (['regular'].indexOf(options.mode.type) < 0) {
+    if (['regular', 'object-json'].indexOf(options.mode.type) < 0) {
       throw new UnsupportedFunctionalityError({
         functionality: `${options.mode.type} mode`,
       });
@@ -222,26 +223,7 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
     const session = await this.getSession();
     const message = this.formatMessages(options);
     const promptStream = session.promptStreaming(message);
-
-    let tempResult = '';
-    const transformStream = new TransformStream<
-      string,
-      LanguageModelV1StreamPart
-    >({
-      transform(textDelta, controller) {
-        controller.enqueue({ type: 'text-delta', textDelta });
-        tempResult = textDelta;
-      },
-      flush(controller) {
-        controller.enqueue({
-          type: 'finish',
-          finishReason: 'stop',
-          usage: { completionTokens: 0, promptTokens: 0 },
-        });
-        debug('stream result:', tempResult);
-        tempResult = '';
-      },
-    });
+    const transformStream = new StreamAI();
     const stream = promptStream.pipeThrough(transformStream);
 
     return {
