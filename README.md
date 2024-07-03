@@ -115,7 +115,7 @@ console.log(result);
 //  I am a large language model, trained by Google.
 ```
 
-Chrome built-in language models can also be used in the generateObject function:
+Chrome built-in language models can also be used in the `generateObject/streamObject` function:
 
 ```javascript
 import { generateObject } from 'ai';
@@ -143,7 +143,35 @@ console.log(object);
 // { recipe: {...} }
 ```
 
-> Due to model reasons, `toolCall` and `streamObject` are not supported. We are making an effort to implement these functions by prompt engineering.
+```javascript
+import { streamObject } from 'ai';
+import { chromeai } from 'chrome-ai';
+import { z } from 'zod';
+
+const { partialObjectStream } = await streamObject({
+  model: chromeai(),
+  schema: z.object({
+    recipe: z.object({
+      name: z.string(),
+      ingredients: z.array(
+        z.object({
+          name: z.string(),
+          amount: z.string(),
+        })
+      ),
+      steps: z.array(z.string()),
+    }),
+  }),
+  prompt: 'Generate a lasagna recipe.',
+});
+
+for await (const partialObject of result.partialObjectStream) {
+  console.log(JSON.stringify(partialObject, null, 2));
+  // { recipe: {...} }
+}
+```
+
+> Due to model reasons, `toolCall/functionCall` are not supported. We are making an effort to implement these functions by prompt engineering.
 
 ## Enable AI in Chrome
 

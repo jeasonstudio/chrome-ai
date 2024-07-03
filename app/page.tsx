@@ -1,92 +1,205 @@
 'use client';
 
-import Image from 'next/image';
+import {
+  CornerDownLeft,
+  Command,
+  Eraser,
+  Chrome,
+  Triangle,
+  LoaderCircle,
+} from 'lucide-react';
+import { Badge } from './components/ui/badge';
+import { Button } from './components/ui/button';
+import { Label } from './components/ui/label';
+import { Textarea } from './components/ui/textarea';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from './components/ui/tooltip';
+import { Layout } from './components/layout';
+import { marked } from 'marked';
 import React from 'react';
-
-import { streamText } from 'ai';
-import { chromeai } from 'chrome-ai';
-import { PromptCard } from './components/prompt-card';
-import { ChatCard } from './components/chat-card';
-import { Alert, AlertDescription, AlertTitle } from './components/ui/alert';
-import { AlertCircle } from 'lucide-react';
-import { Footer } from './components/footer';
-import { checkEnv } from './utils';
-
-const model = chromeai('generic');
+import { CoreMessage, streamText } from 'ai';
+import { Skeleton } from './components/ui/skeleton';
+import {
+  Settings,
+  useSettingsForm,
+  useSettingsModel,
+} from './components/settings';
 
 const HomePage: React.FC<unknown> = () => {
-  const [result, setResult] = React.useState<string | undefined>(undefined);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | undefined>(undefined);
+  const form = useSettingsForm({
+    temperature: 0.8,
+    topK: 3,
+    content: 'You are a helpful assistant.',
+  });
+  const model = useSettingsModel(form);
 
-  const onPrompt = async (prompt: string) => {
+  const [loading, setLoading] = React.useState(false);
+  const [message, setMessage] = React.useState<string>('');
+  const [messages, setMessages] = React.useState<CoreMessage[]>([]);
+
+  const onSendMessage = async () => {
+    const userMessage: CoreMessage = { role: 'user', content: message };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setMessage('');
+
+    const [role, roleContent] = form.getValues(['role', 'content']);
+    const promptMessage: CoreMessage = { role, content: roleContent };
+
     try {
-      await checkEnv();
-      setResult(undefined);
-      setError(undefined);
       setLoading(true);
       const startTimestamp = Date.now();
       const { textStream } = await streamText({
         model,
-        system: 'You are a helpful assistant.',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [promptMessage, ...newMessages],
       });
+      let resultMessage = '';
+      setMessages([
+        ...newMessages,
+        { role: 'assistant', content: resultMessage },
+      ]);
       for await (const textPart of textStream) {
-        setResult(textPart);
+        resultMessage += textPart;
+        setMessages([
+          ...newMessages,
+          { role: 'assistant', content: resultMessage },
+        ]);
       }
       setLoading(false);
       const cost = Date.now() - startTimestamp;
       console.log('cost:', cost, 'ms');
     } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
-      setError((error as any).message);
     }
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col">
-      <main className="container mx-auto grid gap-8 grid-cols-1">
-        <div className="relative mb-4 flex items-center justify-center py-[26vh] pt-[18vh] sm:pt-[26vh]">
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-            <div className="relative mb-72 h-full w-full min-w-[29rem] max-w-[96rem] sm:mb-0">
-              <Image
-                alt="background"
-                data-nimg="fill"
-                width="0"
-                height="0"
-                className="pointer-events-none absolute inset-0 -z-10 -translate-x-2 select-none sm:translate-x-0 h-full w-full dark:hidden"
-                src="https://v0.dev/v0-background.svg"
-              />
-            </div>
-          </div>
-          <div className="relative flex w-full flex-col items-center gap-6 px-6">
-            <div className="flex w-full flex-col items-center gap-1.5">
-              <h2
-                className="text-4xl font-semibold tracking-tighter sm:text-5xl [@media(max-width:480px)]:text-[2rem]"
-                data-testid="home-h2"
+    <Layout>
+      <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3 h-screen">
+        <Settings form={form} />
+        <div className="relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 lg:col-span-2 mt-2">
+          <Badge variant="outline" className="absolute right-3 top-3">
+            Outputs
+          </Badge>
+          <div className="flex-1 mt-3 overflow-y-auto">
+            {messages.map((msg, index) => (
+              <div
+                className="w-full flex flex-row gap-2 p-2 hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900 rounded"
+                key={JSON.stringify(msg) + index}
               >
-                Chrome AI
-              </h2>
-              <p>Vercel AI provider for Chrome built-in model (Gemini Nano)</p>
-            </div>
-            <div className="z-10 m-auto flex w-full flex-col overflow-hidden sm:max-w-xl">
-              <PromptCard onPrompt={onPrompt} />
-              <div className="pt-8">
-                <ChatCard message={result} loading={loading} />
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
+                <div className="flex-grow-0 text-muted-foreground">
+                  {msg.role === 'user' ? (
+                    <Triangle className="size-5 m-1" />
+                  ) : (
+                    <Chrome className="size-5 m-1" />
+                  )}
+                </div>
+
+                {!msg.content && loading && index === messages.length - 1 ? (
+                  <Skeleton className="h-5 mt-1 mb-1 w-60" />
+                ) : (
+                  <article
+                    className="prose prose-zinc prose-base flex-grow dark:prose-invert"
+                    dangerouslySetInnerHTML={{
+                      __html: marked.parse(msg.content as string),
+                    }}
+                  />
                 )}
               </div>
-            </div>
+            ))}
           </div>
+          <form
+            className="relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
+            x-chunk="dashboard-03-chunk-1"
+          >
+            <Label htmlFor="message" className="sr-only">
+              Message
+            </Label>
+            <Textarea
+              id="message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              placeholder="Type your message here..."
+              className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+              onKeyDown={(event) => {
+                if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+                  onSendMessage();
+                }
+              }}
+            />
+            <div className="flex items-end p-3 pt-0">
+              {/* <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Paperclip className="size-4" />
+                      <span className="sr-only">Attach file</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Attach File</TooltipContent>
+                </Tooltip>
+              </TooltipProvider> */}
+              {/* <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Mic className="size-4" />
+                      <span className="sr-only">Use Microphone</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Use Microphone</TooltipContent>
+                </Tooltip>
+              </TooltipProvider> */}
+              {loading ? (
+                <Button size="sm" className="ml-auto" disabled={loading}>
+                  <LoaderCircle className="animate-spin size-3.5 mr-1" />{' '}
+                  Generating...
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={onSendMessage}
+                  disabled={loading}
+                >
+                  Send Message (<Command className="size-3.5" />+
+                  <CornerDownLeft className="size-3.5" />)
+                </Button>
+              )}
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-2"
+                      disabled={loading}
+                    >
+                      <Eraser className="size-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    align="end"
+                    onClick={() => {
+                      setMessages([]);
+                    }}
+                  >
+                    Clear chat history
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </form>
         </div>
       </main>
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 
