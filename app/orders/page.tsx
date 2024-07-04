@@ -27,6 +27,7 @@ import {
   useSettingsModel,
 } from '../components/settings';
 import { z } from 'zod';
+import { Outputs } from '../components/outputs';
 
 const schema = z.object({
   name: z.string({ description: 'customer name' }),
@@ -85,7 +86,7 @@ const OrdersPage: React.FC<unknown> = () => {
     <Layout>
       <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3 h-screen">
         <Settings form={form} />
-        <div className="relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 lg:col-span-2 mt-2">
+        <Outputs>
           <div className="mb-2">
             {loading ? (
               <Button size="sm" className="ml-auto" disabled={loading}>
@@ -147,7 +148,7 @@ const OrdersPage: React.FC<unknown> = () => {
               </Table>
             </CardContent>
           </Card>
-        </div>
+        </Outputs>
       </main>
     </Layout>
   );
