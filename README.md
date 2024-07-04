@@ -81,6 +81,22 @@ You can use the following optional settings to customize:
 - **temperature** `number` (default: `0.8`)
 - **topK** `number` (default: `3`)
 
+## Embedding models
+
+```ts
+import { chromeai } from 'chrome-ai';
+import { embedMany, cosineSimilarity } from 'ai';
+
+const { embeddings } = await embedMany({
+  model: chromeai.embedding(),
+  values: ['sunny day at the beach', 'rainy afternoon in the city'],
+});
+// [[1.9545, 0.0318...], [1.8015, 0.1504...]]
+
+const similarity = cosineSimilarity(embeddings[0], embeddings[1]);
+// similarity: 0.9474937159037822
+```
+
 ## 🎯 Examples
 
 You can use Chrome built-in language models to generate text with the `generateText` or `streamText` function:
