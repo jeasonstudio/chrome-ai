@@ -1,5 +1,11 @@
 # chrome-ai
 
+## 1.7.0
+
+### Minor Changes
+
+- 864c167: feat: add embedding model for client side embed with ai sdk
+
 ## 1.6.0
 
 ### Minor Changes
