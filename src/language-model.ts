@@ -17,6 +17,7 @@ import {
 import { ChromeAISession, ChromeAISessionOptions } from './global';
 import createDebug from 'debug';
 import { StreamAI } from './stream-ai';
+import { chromeEmbedding } from './embedding-model';
 
 const debug = createDebug('chromeai');
 
@@ -237,3 +238,5 @@ export const chromeai = (
   modelId: ChromeAIChatModelId = 'generic',
   settings: ChromeAIChatSettings = {}
 ) => new ChromeAIChatLanguageModel(modelId, settings);
+
+chromeai.embedding = chromeEmbedding;

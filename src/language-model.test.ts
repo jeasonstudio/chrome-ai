@@ -7,7 +7,7 @@ import {
 } from '@ai-sdk/provider';
 import { z } from 'zod';
 
-describe('chrome-ai', () => {
+describe('language-model', () => {
   // Reset all stubs after each test
   afterEach(() => {
     vi.unstubAllGlobals();
