@@ -28,6 +28,7 @@ import {
   useSettingsForm,
   useSettingsModel,
 } from './components/settings';
+import { Outputs } from './components/outputs';
 
 const HomePage: React.FC<unknown> = () => {
   const form = useSettingsForm({
@@ -83,7 +84,7 @@ const HomePage: React.FC<unknown> = () => {
     <Layout>
       <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3 h-screen">
         <Settings form={form} />
-        <div className="relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 lg:col-span-2 mt-2">
+        <Outputs>
           <Badge variant="outline" className="absolute right-3 top-3">
             Outputs
           </Badge>
@@ -197,7 +198,7 @@ const HomePage: React.FC<unknown> = () => {
               </TooltipProvider>
             </div>
           </form>
-        </div>
+        </Outputs>
       </main>
     </Layout>
   );
