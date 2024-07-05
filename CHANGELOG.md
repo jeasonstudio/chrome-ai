@@ -1,5 +1,11 @@
 # chrome-ai
 
+## 1.7.1
+
+### Patch Changes
+
+- c999022: feat: stream text/object support abort signal
+
 ## 1.7.0
 
 ### Minor Changes
