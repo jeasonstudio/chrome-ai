@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { ChromeAIEmbeddingModel, chromeEmbedding } from './embedding-model';
+import { ChromeAIEmbeddingModel } from './embedding-model';
 import { embed } from 'ai';
 
 vi.mock('@mediapipe/tasks-text', async () => ({
@@ -23,10 +23,10 @@ vi.mock('@mediapipe/tasks-text', async () => ({
 describe('embedding-model', () => {
   it('should instantiation anyways', async () => {
     expect(new ChromeAIEmbeddingModel()).toBeInstanceOf(ChromeAIEmbeddingModel);
-    expect(chromeEmbedding()).toBeInstanceOf(ChromeAIEmbeddingModel);
+    expect(new ChromeAIEmbeddingModel()).toBeInstanceOf(ChromeAIEmbeddingModel);
   });
   it('should embed', async () => {
-    const model = chromeEmbedding();
+    const model = new ChromeAIEmbeddingModel();
     expect(
       await embed({
         model,
@@ -45,7 +45,7 @@ describe('embedding-model', () => {
   it('should embed result empty', async () => {
     expect(
       await embed({
-        model: chromeEmbedding({ l2Normalize: true }),
+        model: new ChromeAIEmbeddingModel({ l2Normalize: true }),
         value: 'undefined',
       })
     ).toMatchObject({ embedding: [] });

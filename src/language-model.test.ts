@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { chromeai, ChromeAIChatLanguageModel } from './index';
+import { ChromeAIChatLanguageModel } from './index';
 import { generateText, streamText, generateObject, streamObject } from 'ai';
 import {
   LoadSettingError,
@@ -14,17 +14,22 @@ describe('language-model', () => {
   });
 
   it('should instantiation anyways', () => {
-    expect(chromeai()).toBeInstanceOf(ChromeAIChatLanguageModel);
-    expect(chromeai().modelId).toBe('generic');
-    expect(chromeai('text').modelId).toBe('text');
+    expect(new ChromeAIChatLanguageModel('generic')).toBeInstanceOf(
+      ChromeAIChatLanguageModel
+    );
+    expect(new ChromeAIChatLanguageModel('text').modelId).toBe('text');
     expect(
-      chromeai('text', { temperature: 1, topK: 10 }).options
+      new ChromeAIChatLanguageModel('text', { temperature: 1, topK: 10 })
+        .options
     ).toMatchObject({ temperature: 1, topK: 10 });
   });
 
   it('should throw when not support', async () => {
     await expect(() =>
-      generateText({ model: chromeai(), prompt: 'empty' })
+      generateText({
+        model: new ChromeAIChatLanguageModel('generic'),
+        prompt: 'empty',
+      })
     ).rejects.toThrowError(LoadSettingError);
 
     const cannotCreateSession = vi.fn(async () => 'no');
@@ -34,12 +39,18 @@ describe('language-model', () => {
     });
 
     await expect(() =>
-      generateText({ model: chromeai('text'), prompt: 'empty' })
+      generateText({
+        model: new ChromeAIChatLanguageModel('text'),
+        prompt: 'empty',
+      })
     ).rejects.toThrowError(LoadSettingError);
     expect(cannotCreateSession).toHaveBeenCalledTimes(1);
 
     await expect(() =>
-      generateText({ model: chromeai('generic'), prompt: 'empty' })
+      generateText({
+        model: new ChromeAIChatLanguageModel('generic'),
+        prompt: 'empty',
+      })
     ).rejects.toThrowError(LoadSettingError);
     expect(cannotCreateSession).toHaveBeenCalledTimes(2);
   });
@@ -58,17 +69,23 @@ describe('language-model', () => {
       createTextSession: createSession,
     });
 
-    await generateText({ model: chromeai('text'), prompt: 'test' });
+    await generateText({
+      model: new ChromeAIChatLanguageModel('text'),
+      prompt: 'test',
+    });
     expect(getOptions).toHaveBeenCalledTimes(1);
 
-    const result = await generateText({ model: chromeai(), prompt: 'test' });
+    const result = await generateText({
+      model: new ChromeAIChatLanguageModel('generic'),
+      prompt: 'test',
+    });
     expect(result).toMatchObject({
       finishReason: 'stop',
       text: 'test',
     });
 
     const resultForMessages = await generateText({
-      model: chromeai(),
+      model: new ChromeAIChatLanguageModel('generic'),
       messages: [
         { role: 'user', content: 'test' },
         { role: 'assistant', content: 'assistant' },
@@ -95,7 +112,10 @@ describe('language-model', () => {
       createGenericSession: vi.fn(async () => ({ promptStreaming })),
     });
 
-    const result = await streamText({ model: chromeai(), prompt: 'test' });
+    const result = await streamText({
+      model: new ChromeAIChatLanguageModel('generic'),
+      prompt: 'test',
+    });
     for await (const textPart of result.textStream) {
       expect(textPart).toBe('test');
     }
@@ -110,7 +130,7 @@ describe('language-model', () => {
     });
 
     const { object } = await generateObject({
-      model: chromeai(),
+      model: new ChromeAIChatLanguageModel('generic'),
       schema: z.object({
         hello: z.string(),
       }),
@@ -129,7 +149,7 @@ describe('language-model', () => {
     });
     await expect(() =>
       generateText({
-        model: chromeai(),
+        model: new ChromeAIChatLanguageModel('generic'),
         messages: [
           {
             role: 'tool',
@@ -161,7 +181,7 @@ describe('language-model', () => {
 
     await expect(() =>
       generateObject({
-        model: chromeai(),
+        model: new ChromeAIChatLanguageModel('generic'),
         mode: 'grammar',
         schema: z.object({}),
         prompt: 'test',
@@ -170,7 +190,7 @@ describe('language-model', () => {
 
     await expect(() =>
       streamObject({
-        model: chromeai(),
+        model: new ChromeAIChatLanguageModel('generic'),
         mode: 'grammar',
         schema: z.object({}),
         prompt: 'test',

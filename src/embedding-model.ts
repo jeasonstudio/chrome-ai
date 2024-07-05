@@ -36,10 +36,13 @@ export interface ChromeAIEmbeddingModelSettings {
   delegate?: 'CPU' | 'GPU';
 }
 
+// See more:
+// - https://github.com/google-ai-edge/mediapipe
+// - https://ai.google.dev/edge/mediapipe/solutions/text/text_embedder/web_js
 export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
   readonly specificationVersion = 'v1';
   readonly provider = 'google-mediapipe';
-  readonly modelId: string = 'mediapipe';
+  readonly modelId: string = 'embedding';
   readonly supportsParallelCalls = true;
   readonly maxEmbeddingsPerCall = undefined;
 
@@ -80,18 +83,12 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
     rawResponse?: Record<PropertyKey, any>;
   }> => {
     // if (options.abortSignal) console.warn('abortSignal is not supported');
-
     const embedder = await this.getTextEmbedder();
-    const embeddings = await Promise.all(
-      options.values.map((text) => {
-        const embedderResult = embedder.embed(text);
-        const [embedding] = embedderResult.embeddings;
-        return embedding?.floatEmbedding ?? [];
-      })
-    );
+    const embeddings = options.values.map((text) => {
+      const embedderResult = embedder.embed(text);
+      const [embedding] = embedderResult.embeddings;
+      return embedding?.floatEmbedding ?? [];
+    });
     return { embeddings };
   };
 }
-
-export const chromeEmbedding = (options?: ChromeAIEmbeddingModelSettings) =>
-  new ChromeAIEmbeddingModel(options);

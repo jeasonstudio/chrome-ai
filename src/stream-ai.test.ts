@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { StreamAI } from './stream-ai';
 
 describe('stream-ai', () => {
@@ -22,5 +22,23 @@ describe('stream-ai', () => {
     expect(await reader.read()).toMatchObject({
       value: { type: 'finish' },
     });
+  });
+
+  it('should abort when signal', async () => {
+    const controller = new AbortController();
+    const transformStream = new StreamAI(controller.signal);
+
+    const writer = transformStream.writable.getWriter();
+    const reader = transformStream.readable.getReader();
+
+    writer.write('hello');
+
+    expect(await reader.read()).toMatchObject({
+      value: { type: 'text-delta', textDelta: 'hello' },
+      done: false,
+    });
+
+    controller.abort();
+    expect(await reader.read()).toMatchObject({ done: true });
   });
 });
