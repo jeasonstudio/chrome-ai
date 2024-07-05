@@ -17,7 +17,10 @@ import {
 import { ChromeAISession, ChromeAISessionOptions } from './global';
 import createDebug from 'debug';
 import { StreamAI } from './stream-ai';
-import { chromeEmbedding } from './embedding-model';
+import {
+  ChromeAIEmbeddingModel,
+  ChromeAIEmbeddingModelSettings,
+} from './embedding-model';
 
 const debug = createDebug('chromeai');
 
@@ -224,7 +227,7 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
     const session = await this.getSession();
     const message = this.formatMessages(options);
     const promptStream = session.promptStreaming(message);
-    const transformStream = new StreamAI();
+    const transformStream = new StreamAI(options.abortSignal);
     const stream = promptStream.pipeThrough(transformStream);
 
     return {
@@ -233,10 +236,3 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
     };
   };
 }
-
-export const chromeai = (
-  modelId: ChromeAIChatModelId = 'generic',
-  settings: ChromeAIChatSettings = {}
-) => new ChromeAIChatLanguageModel(modelId, settings);
-
-chromeai.embedding = chromeEmbedding;

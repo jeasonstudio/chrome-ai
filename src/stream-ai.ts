@@ -7,11 +7,17 @@ export class StreamAI extends TransformStream<
   string,
   LanguageModelV1StreamPart
 > {
-  public constructor() {
+  public constructor(abortSignal?: AbortSignal) {
     let textTemp = '';
     super({
-      start: () => {
+      start: (controller) => {
         textTemp = '';
+        if (!abortSignal) return;
+        abortSignal.addEventListener('abort', () => {
+          debug('streamText terminate by abortSignal');
+          controller.terminate();
+          textTemp = '';
+        });
       },
       transform: (chunk, controller) => {
         const textDelta = chunk.replace(textTemp, '');
