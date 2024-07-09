@@ -7,4 +7,12 @@ export default defineConfig([
     format: ['cjs', 'esm'],
     sourcemap: true,
   },
+  {
+    dts: true,
+    entry: {
+      polyfill: 'src/polyfill/index.ts',
+    },
+    format: ['cjs', 'esm', 'iife'],
+    sourcemap: true,
+  },
 ]);

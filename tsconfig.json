@@ -2,9 +2,11 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["./*"],
-      "chrome-ai": ["./src/index.ts"]
+      "@/*": ["src/*"],
+      "chrome-ai-polyfill": ["src/polyfill/index.ts"],
+      "chrome-ai/*": ["src/*"]
     },
     "incremental": true
   },

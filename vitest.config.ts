@@ -8,6 +8,7 @@ export default defineConfig({
       // If you want a coverage reports even if your tests are failing, include the reportOnFailure option
       reportOnFailure: true,
       include: ['src/**/*.ts'],
+      exclude: ['src/polyfill/*'], // TODO@jeasonstudio: finish the polyfill tests
     },
   },
 });

@@ -1,4 +1,4 @@
-export type ChromeAISessionAvailable = 'no' | 'readily';
+export type ChromeAISessionAvailable = 'no' | 'after-download' | 'readily';
 
 export interface ChromeAISessionOptions {
   temperature?: number;
@@ -18,11 +18,21 @@ export interface ChromePromptAPI {
   canCreateTextSession: () => Promise<ChromeAISessionAvailable>;
   defaultGenericSessionOptions: () => Promise<ChromeAISessionOptions>;
   defaultTextSessionOptions: () => Promise<ChromeAISessionOptions>;
-  createGenericSession: (options?: ChromeAISessionOptions) => Promise<ChromeAISession>;
-  createTextSession: (options?: ChromeAISessionOptions) => Promise<ChromeAISession>;
+  createGenericSession: (
+    options?: ChromeAISessionOptions
+  ) => Promise<ChromeAISession>;
+  createTextSession: (
+    options?: ChromeAISessionOptions
+  ) => Promise<ChromeAISession>;
+}
+
+export interface PolyfillChromeAIOptions {
+  llmModelAssetPath: string;
+  filesetBasePath: string;
 }
 
 declare global {
   var ai: ChromePromptAPI;
   var model = ai;
+  var __polyfill_ai_options__: Partial<PolyfillChromeAIOptions> | undefined;
 }

@@ -8,6 +8,9 @@ dependencies:
   '@ai-sdk/provider':
     specifier: ^0.0.11
     version: 0.0.11
+  '@mediapipe/tasks-genai':
+    specifier: ^0.10.14
+    version: 0.10.14
   '@mediapipe/tasks-text':
     specifier: ^0.10.14
     version: 0.10.14
@@ -1205,6 +1208,10 @@ packages:
       - encoding
       - supports-color
     dev: true
+
+  /@mediapipe/tasks-genai@0.10.14:
+    resolution: {integrity: sha512-2XYVRJl/ylWLmBRzm7TVrl2yF8tKK2HCWypBno1KIVGPwY2i4mFlzt05itqBsTEwZbVYS/rZ15gLE9ypc6Nw3w==}
+    dev: false
 
   /@mediapipe/tasks-text@0.10.14:
     resolution: {integrity: sha512-hQU/t9df83lU083sjbX69ImipPOqfvdMnc0pMk44L0QkRXKjSp9q1OYVhA5ePOe1bUmEUzaYSPPTwz+mNhFqhw==}
