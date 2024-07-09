@@ -43,7 +43,7 @@
 > ⚠️ Note:
 > * This module is under development and may contain errors and frequent incompatible changes.
 > * Chrome's implementation of [built-in AI with Gemini Nano](https://developer.chrome.com/docs/ai/built-in) is an experiment and will change as they test and address feedback.
-> * If you've never heard of it before, [follow these steps](#enable-ai-in-chrome) to turn on Chrome's built-in AI.
+> * If you've never heard of it before, [follow these steps](#enabling-ai-in-chrome) to turn on Chrome's built-in AI.
 
 ## 📦 Installation
 
@@ -189,7 +189,7 @@ for await (const partialObject of result.partialObjectStream) {
 
 > Due to model reasons, `toolCall/functionCall` are not supported. We are making an effort to implement these functions by prompt engineering.
 
-## Enable AI in Chrome
+## Enabling AI in Chrome
 
 Chrome built-in AI is a preview feature, you need to use chrome version 127 or greater, now in [dev](https://www.google.com/chrome/dev/?extra=devchannel) or [canary](https://www.google.com/chrome/canary/) channel, [may release on stable chanel at Jul 17, 2024](https://chromestatus.com/roadmap).
 
@@ -197,6 +197,14 @@ After then, you should turn on these flags:
 * [chrome://flags/#prompt-api-for-gemini-nano](chrome://flags/#prompt-api-for-gemini-nano): `Enabled`
 * [chrome://flags/#optimization-guide-on-device-model](chrome://flags/#optimization-guide-on-device-model): `Enabled BypassPrefRequirement`
 * [chrome://components/](chrome://components/): Click `Optimization Guide On Device Model` to download the model.
+
+Or you can try using the experimental feature: `chrome-ai/polyfill`, to use `chrome-ai` in any browser that supports WebGPU and WebAssembly.
+
+```ts
+import 'chrome-ai/polyfill';
+// or
+requre('chrome-ai/polyfill');
+```
 
 ## License
 
