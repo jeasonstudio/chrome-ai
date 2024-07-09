@@ -1,5 +1,6 @@
 'use client';
 
+require('chrome-ai/polyfill');
 import {
   CornerDownLeft,
   Command,
