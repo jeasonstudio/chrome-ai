@@ -60,7 +60,9 @@ class PolyfillChromeAISession implements ChromeAISession {
  */
 export class PolyfillChromeAI implements ChromePromptAPI {
   private aiOptions: PolyfillChromeAIOptions = {
-    llmModelAssetPath: 'http://localhost:63767/weights.bin',
+    // About 1.78GB, should cache by browser
+    llmModelAssetPath:
+      'https://huggingface.co/oongaboongahacker/Gemini-Nano/resolve/main/weights.bin',
     filesetBasePath: 'https://unpkg.com/@mediapipe/tasks-genai/wasm/',
   };
 
@@ -112,3 +114,11 @@ export class PolyfillChromeAI implements ChromePromptAPI {
   public createGenericSession = this.createSession;
   public createTextSession = this.createSession;
 }
+
+export const polyfillChromeAI = (
+  options?: Partial<PolyfillChromeAIOptions>
+) => {
+  const ai = new PolyfillChromeAI(options);
+  globalThis.ai = globalThis.ai || ai;
+  globalThis.model = globalThis.model || ai;
+};
