@@ -1,5 +1,11 @@
 # chrome-ai
 
+## 1.8.0
+
+### Minor Changes
+
+- cfd217e: feat: add chrome-ai polyfill when chrome version not ok
+
 ## 1.7.1
 
 ### Patch Changes
