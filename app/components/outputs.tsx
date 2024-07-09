@@ -14,7 +14,6 @@ export const Outputs = React.forwardRef<
 >(({ children, ...props }, ref) => {
   let infoElement = null;
 
-  const [isBrowserSupport, setIsBrowserSupport] = React.useState(true);
   const [isEnabledFlags, setIsEnabledFlags] = React.useState(true);
 
   React.useEffect(() => {
@@ -23,7 +22,7 @@ export const Outputs = React.forwardRef<
       return raw ? parseInt(raw[2], 10) : 0;
     }
     const version = getChromeVersion();
-    setIsBrowserSupport(version >= 127);
+    // setIsBrowserSupport(version >= 127);
 
     setIsEnabledFlags(!!('ai' in globalThis));
 
@@ -32,7 +31,7 @@ export const Outputs = React.forwardRef<
     });
   }, []);
 
-  if (!isBrowserSupport || !isEnabledFlags) {
+  if (!isEnabledFlags) {
     infoElement = (
       <div className="w-[500px] m-auto flex flex-col gap-4">
         <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
@@ -43,15 +42,13 @@ export const Outputs = React.forwardRef<
           experimental and will change as they test and address feedback.
         </p>
 
-        {isBrowserSupport ? null : (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Your browser is not supported.</AlertTitle>
-            <AlertDescription>
-              Please update Chrome to version 127 or higher.
-            </AlertDescription>
-          </Alert>
-        )}
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Your browser is not supported.</AlertTitle>
+          <AlertDescription>
+            Please update Chrome to version 127 or higher.
+          </AlertDescription>
+        </Alert>
 
         {isEnabledFlags ? null : (
           <div className="flex flex-col items-start justify-start">

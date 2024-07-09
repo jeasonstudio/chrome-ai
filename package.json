@@ -7,13 +7,23 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./polyfill": {
+      "import": "./dist/polyfill.mjs",
+      "require": "./dist/polyfill.js",
+      "types": "./dist/polyfill.d.ts"
     }
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/polyfill.global.js",
+    "./dist/polyfill.js",
+    "./dist/polyfill.mjs"
+  ],
   "scripts": {
     "dev": "tsup --tsconfig=tsconfig.tsup.json --watch",
-    "build": "tsup --tsconfig=tsconfig.tsup.json",
+    "build": "tsup --tsconfig=tsconfig.tsup.json --clean",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "test:ci": "vitest --run",
@@ -36,6 +46,7 @@
   },
   "dependencies": {
     "@ai-sdk/provider": "^0.0.11",
+    "@mediapipe/tasks-genai": "^0.10.14",
     "@mediapipe/tasks-text": "^0.10.14",
     "debug": "^4.3.5"
   },
