@@ -124,7 +124,7 @@ const { textStream } = await streamText({
 
 let result = '';
 for await (const textPart of textStream) {
-  result = textPart;
+  result += textPart;
 }
 
 console.log(result);
