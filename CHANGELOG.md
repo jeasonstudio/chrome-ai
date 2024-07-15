@@ -1,5 +1,11 @@
 # chrome-ai
 
+## 1.9.0
+
+### Minor Changes
+
+- 773d9d5: chore: adapte to chrome's prompt api changes
+
 ## 1.8.0
 
 ### Minor Changes
