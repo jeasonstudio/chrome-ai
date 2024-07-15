@@ -26,7 +26,7 @@ export const Outputs = React.forwardRef<
 
     setIsEnabledFlags(!!('ai' in globalThis));
 
-    globalThis.ai?.canCreateGenericSession().then((status) => {
+    globalThis.ai?.canCreateTextSession().then((status) => {
       setIsEnabledFlags(status === 'readily');
     });
   }, []);

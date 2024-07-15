@@ -17,14 +17,10 @@ import {
 import { ChromeAISession, ChromeAISessionOptions } from './global';
 import createDebug from 'debug';
 import { StreamAI } from './stream-ai';
-import {
-  ChromeAIEmbeddingModel,
-  ChromeAIEmbeddingModelSettings,
-} from './embedding-model';
 
 const debug = createDebug('chromeai');
 
-export type ChromeAIChatModelId = 'text' | 'generic';
+export type ChromeAIChatModelId = 'text';
 
 export interface ChromeAIChatSettings extends Record<string, unknown> {
   temperature?: number;
@@ -80,7 +76,7 @@ function getStringContent(
 export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   readonly specificationVersion = 'v1';
   readonly defaultObjectGenerationMode = 'json';
-  readonly modelId: ChromeAIChatModelId = 'generic';
+  readonly modelId: ChromeAIChatModelId = 'text';
   readonly provider = 'gemini-nano';
   options: ChromeAIChatSettings;
 
@@ -97,14 +93,11 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   private getSession = async (
     options?: ChromeAISessionOptions
   ): Promise<ChromeAISession> => {
-    if (!globalThis.ai?.canCreateGenericSession) {
+    if (!globalThis.ai?.canCreateTextSession) {
       throw new LoadSettingError({ message: 'Browser not support' });
     }
 
-    const available =
-      this.modelId === 'text'
-        ? await ai.canCreateTextSession()
-        : await ai.canCreateGenericSession();
+    const available = await ai.canCreateTextSession();
 
     if (this.session) return this.session;
 
@@ -112,16 +105,10 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
       throw new LoadSettingError({ message: 'Built-in model not ready' });
     }
 
-    const defaultOptions =
-      this.modelId === 'text'
-        ? await ai.defaultTextSessionOptions()
-        : await ai.defaultGenericSessionOptions();
+    const defaultOptions = await ai.defaultTextSessionOptions();
     this.options = { ...defaultOptions, ...this.options, ...options };
 
-    this.session =
-      this.modelId === 'text'
-        ? await ai.createTextSession(this.options)
-        : await ai.createGenericSession(this.options);
+    this.session = await ai.createTextSession(this.options);
 
     debug('session created:', this.session, this.options);
     return this.session;

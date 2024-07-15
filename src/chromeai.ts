@@ -13,7 +13,7 @@ const debug = createDebug('chromeai');
 
 /**
  * Create a new ChromeAI model/embedding instance.
- * @param modelId 'generic' | 'text' | 'embedding'
+ * @param modelId 'text' | 'embedding'
  * @param settings Options for the model
  */
 export function chromeai(
@@ -24,7 +24,7 @@ export function chromeai(
   modelId?: 'embedding',
   settings?: ChromeAIEmbeddingModelSettings
 ): ChromeAIEmbeddingModel;
-export function chromeai(modelId: string = 'generic', settings: any = {}) {
+export function chromeai(modelId: string = 'text', settings: any = {}) {
   debug('create instance', modelId, settings);
   if (modelId === 'embedding') {
     return new ChromeAIEmbeddingModel(settings);

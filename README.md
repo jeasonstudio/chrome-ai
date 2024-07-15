@@ -68,7 +68,7 @@ It automatically selects the correct model id. You can also pass additional sett
 ```ts
 import { chromeai } from 'chrome-ai';
 
-const model = chromeai('generic', {
+const model = chromeai('text', {
   // additional settings
   temperature: 0.5,
   topK: 5,
@@ -77,7 +77,7 @@ const model = chromeai('generic', {
 
 You can use the following optional settings to customize:
 
-- **modelId** `'text' | 'generic'` (default: `'generic'`)
+- **modelId** `'text' (default: `'text'`)
 - **temperature** `number` (default: `0.8`)
 - **topK** `number` (default: `3`)
 
