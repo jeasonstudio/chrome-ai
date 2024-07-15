@@ -107,11 +107,9 @@ export class PolyfillChromeAI implements ChromePromptAPI {
     return session;
   };
 
-  public canCreateGenericSession = this.canCreateSession;
+
   public canCreateTextSession = this.canCreateSession;
-  public defaultGenericSessionOptions = this.defaultSessionOptions;
   public defaultTextSessionOptions = this.defaultSessionOptions;
-  public createGenericSession = this.createSession;
   public createTextSession = this.createSession;
 }
 

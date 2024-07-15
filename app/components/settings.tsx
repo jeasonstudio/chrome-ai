@@ -33,7 +33,7 @@ import { Footer } from '../components/footer';
 import { cn } from '../utils';
 
 const formSchema = z.object({
-  model: z.enum(['generic', 'text']),
+  model: z.enum(['text']),
   temperature: z.number().min(0).max(1),
   topK: z.number().min(1),
   role: z.enum(['system', 'user', 'assistant']),
@@ -52,7 +52,7 @@ export const useSettingsForm = (
     resolver: zodResolver(formSchema),
     defaultValues: Object.assign(
       {
-        model: 'generic',
+        model: 'text',
         temperature: 0.8,
         topK: 3,
         role: 'system',

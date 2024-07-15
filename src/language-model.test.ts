@@ -14,7 +14,7 @@ describe('language-model', () => {
   });
 
   it('should instantiation anyways', () => {
-    expect(new ChromeAIChatLanguageModel('generic')).toBeInstanceOf(
+    expect(new ChromeAIChatLanguageModel('text')).toBeInstanceOf(
       ChromeAIChatLanguageModel
     );
     expect(new ChromeAIChatLanguageModel('text').modelId).toBe('text');
@@ -27,7 +27,7 @@ describe('language-model', () => {
   it('should throw when not support', async () => {
     await expect(() =>
       generateText({
-        model: new ChromeAIChatLanguageModel('generic'),
+        model: new ChromeAIChatLanguageModel('text'),
         prompt: 'empty',
       })
     ).rejects.toThrowError(LoadSettingError);
@@ -35,7 +35,6 @@ describe('language-model', () => {
     const cannotCreateSession = vi.fn(async () => 'no');
     vi.stubGlobal('ai', {
       canCreateTextSession: cannotCreateSession,
-      canCreateGenericSession: cannotCreateSession,
     });
 
     await expect(() =>
@@ -48,7 +47,7 @@ describe('language-model', () => {
 
     await expect(() =>
       generateText({
-        model: new ChromeAIChatLanguageModel('generic'),
+        model: new ChromeAIChatLanguageModel('text'),
         prompt: 'empty',
       })
     ).rejects.toThrowError(LoadSettingError);
@@ -61,11 +60,8 @@ describe('language-model', () => {
     const prompt = vi.fn(async (prompt: string) => prompt);
     const createSession = vi.fn(async () => ({ prompt }));
     vi.stubGlobal('ai', {
-      canCreateGenericSession: canCreateSession,
       canCreateTextSession: canCreateSession,
-      defaultGenericSessionOptions: getOptions,
       defaultTextSessionOptions: getOptions,
-      createGenericSession: createSession,
       createTextSession: createSession,
     });
 
@@ -76,7 +72,7 @@ describe('language-model', () => {
     expect(getOptions).toHaveBeenCalledTimes(1);
 
     const result = await generateText({
-      model: new ChromeAIChatLanguageModel('generic'),
+      model: new ChromeAIChatLanguageModel('text'),
       prompt: 'test',
     });
     expect(result).toMatchObject({
@@ -85,7 +81,7 @@ describe('language-model', () => {
     });
 
     const resultForMessages = await generateText({
-      model: new ChromeAIChatLanguageModel('generic'),
+      model: new ChromeAIChatLanguageModel('text'),
       messages: [
         { role: 'user', content: 'test' },
         { role: 'assistant', content: 'assistant' },
@@ -107,13 +103,13 @@ describe('language-model', () => {
       return stream;
     });
     vi.stubGlobal('ai', {
-      canCreateGenericSession: vi.fn(async () => 'readily'),
-      defaultGenericSessionOptions: vi.fn(async () => ({})),
-      createGenericSession: vi.fn(async () => ({ promptStreaming })),
+      canCreateTextSession: vi.fn(async () => 'readily'),
+      defaultTextSessionOptions: vi.fn(async () => ({})),
+      createTextSession: vi.fn(async () => ({ promptStreaming })),
     });
 
     const result = await streamText({
-      model: new ChromeAIChatLanguageModel('generic'),
+      model: new ChromeAIChatLanguageModel('text'),
       prompt: 'test',
     });
     for await (const textPart of result.textStream) {
@@ -124,13 +120,13 @@ describe('language-model', () => {
   it('should do generate object', async () => {
     const prompt = vi.fn(async (prompt: string) => '{"hello":"world"}');
     vi.stubGlobal('ai', {
-      canCreateGenericSession: vi.fn(async () => 'readily'),
-      defaultGenericSessionOptions: vi.fn(async () => ({})),
-      createGenericSession: vi.fn(async () => ({ prompt })),
+      canCreateTextSession: vi.fn(async () => 'readily'),
+      defaultTextSessionOptions: vi.fn(async () => ({})),
+      createTextSession: vi.fn(async () => ({ prompt })),
     });
 
     const { object } = await generateObject({
-      model: new ChromeAIChatLanguageModel('generic'),
+      model: new ChromeAIChatLanguageModel('text'),
       schema: z.object({
         hello: z.string(),
       }),
@@ -143,13 +139,13 @@ describe('language-model', () => {
   it('should throw when tool call', async () => {
     const prompt = vi.fn(async (prompt: string) => prompt);
     vi.stubGlobal('ai', {
-      canCreateGenericSession: vi.fn(async () => 'readily'),
-      defaultGenericSessionOptions: vi.fn(async () => ({})),
-      createGenericSession: vi.fn(async () => ({ prompt })),
+      canCreateTextSession: vi.fn(async () => 'readily'),
+      defaultTextSessionOptions: vi.fn(async () => ({})),
+      createTextSession: vi.fn(async () => ({ prompt })),
     });
     await expect(() =>
       generateText({
-        model: new ChromeAIChatLanguageModel('generic'),
+        model: new ChromeAIChatLanguageModel('text'),
         messages: [
           {
             role: 'tool',
@@ -166,7 +162,7 @@ describe('language-model', () => {
       })
     ).rejects.toThrowError(UnsupportedFunctionalityError);
 
-    const model = new ChromeAIChatLanguageModel('generic', { temperature: 1 });
+    const model = new ChromeAIChatLanguageModel('text', { temperature: 1 });
     (model as any).session = { prompt };
     const result = await generateText({
       model,
@@ -181,7 +177,7 @@ describe('language-model', () => {
 
     await expect(() =>
       generateObject({
-        model: new ChromeAIChatLanguageModel('generic'),
+        model: new ChromeAIChatLanguageModel('text'),
         mode: 'grammar',
         schema: z.object({}),
         prompt: 'test',
@@ -190,7 +186,7 @@ describe('language-model', () => {
 
     await expect(() =>
       streamObject({
-        model: new ChromeAIChatLanguageModel('generic'),
+        model: new ChromeAIChatLanguageModel('text'),
         mode: 'grammar',
         schema: z.object({}),
         prompt: 'test',
