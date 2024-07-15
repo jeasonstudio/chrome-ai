@@ -123,7 +123,7 @@ export const Settings = React.forwardRef<null, SettingsProps>(
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="generic">
+                        {/* <SelectItem value="generic">
                           <div className="flex items-start gap-3 text-muted-foreground">
                             <div>
                               Gemini Nano{' '}
@@ -132,7 +132,7 @@ export const Settings = React.forwardRef<null, SettingsProps>(
                               </span>
                             </div>
                           </div>
-                        </SelectItem>
+                        </SelectItem> */}
                         <SelectItem value="text">
                           <div className="flex items-start gap-3 text-muted-foreground">
                             <div>

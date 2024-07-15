@@ -1,6 +1,6 @@
 'use client';
 
-import 'chrome-ai/polyfill';
+// import 'chrome-ai/polyfill';
 import { LoaderCircle, SquareKanban } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';

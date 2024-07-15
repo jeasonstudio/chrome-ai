@@ -7,6 +7,7 @@ import {
   Github,
   Twitter,
   SquareKanban,
+  FileInput
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
@@ -78,6 +79,29 @@ export const Layout: React.FC<React.PropsWithChildren<LayoutProps>> = ({
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={5}>
                 Orders Playground
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'rounded-lg',
+                    pathname === '/smart-form' && 'bg-muted'
+                  )}
+                  aria-label="Smart Form Playground"
+                  asChild
+                >
+                  <Link href="/smart-form">
+                    <FileInput className="size-5" />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={5}>
+                Smart Form Playground
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
