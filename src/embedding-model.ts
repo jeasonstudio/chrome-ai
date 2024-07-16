@@ -4,11 +4,11 @@ import { TextEmbedder, FilesetResolver } from '@mediapipe/tasks-text';
 export interface ChromeAIEmbeddingModelSettings {
   /**
    * An optional base path to specify the directory the Wasm files should be loaded from.
-   * It's about 6mb before gzip.
    * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.js'
    */
   wasmLoaderPath?: string;
   /**
+   * It's about 6mb before gzip.
    * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.wasm'
    */
   wasmBinaryPath?: string;
@@ -61,19 +61,18 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
     quantize: false,
   };
   private modelAssetBuffer!: Promise<ReadableStreamDefaultReader>;
-  private textEmbedder: TextEmbedder | null = null;
+  private textEmbedder!: Promise<TextEmbedder>;
 
   public constructor(settings: ChromeAIEmbeddingModelSettings = {}) {
     this.settings = { ...this.settings, ...settings };
     this.modelAssetBuffer = fetch(this.settings.modelAssetPath!).then(
       (response) => response.body!.getReader()
     )!;
-    this.getTextEmbedder();
+    this.textEmbedder = this.getTextEmbedder();
   }
 
   protected getTextEmbedder = async (): Promise<TextEmbedder> => {
-    if (this.textEmbedder !== null) return this.textEmbedder;
-    this.textEmbedder = await TextEmbedder.createFromOptions(
+    return TextEmbedder.createFromOptions(
       {
         wasmBinaryPath: this.settings.wasmBinaryPath!,
         wasmLoaderPath: this.settings.wasmLoaderPath!,
@@ -87,7 +86,6 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
         quantize: this.settings.quantize,
       }
     );
-    return this.textEmbedder;
   };
 
   public doEmbed = async (options: {
@@ -98,7 +96,7 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
     rawResponse?: Record<PropertyKey, any>;
   }> => {
     // if (options.abortSignal) console.warn('abortSignal is not supported');
-    const embedder = await this.getTextEmbedder();
+    const embedder = await this.textEmbedder;
     const embeddings = options.values.map((text) => {
       const embedderResult = embedder.embed(text);
       const [embedding] = embedderResult.embeddings;

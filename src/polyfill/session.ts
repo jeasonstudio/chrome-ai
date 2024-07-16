@@ -15,14 +15,14 @@ class PolyfillChromeAISession implements ChromeAISession {
     debug('PolyfillChromeAISession created', llm);
   }
 
-  private generateText = async (prompt: string): Promise<string> => {
+  public prompt = async (prompt: string): Promise<string> => {
     const response = await this.llm.generateResponse(prompt);
-    debug('generateText', prompt, response);
+    debug('prompt', prompt, response);
     return response;
   };
 
-  private streamText = (prompt: string): ReadableStream<string> => {
-    debug('streamText', prompt);
+  public promptStreaming = (prompt: string): ReadableStream<string> => {
+    debug('promptStreaming', prompt);
     const stream = new ReadableStream<string>({
       start: (controller) => {
         const listener: ProgressListener = (
@@ -40,15 +40,11 @@ class PolyfillChromeAISession implements ChromeAISession {
         console.warn('stream text canceled', reason);
       },
     });
-    debug('streamText', prompt);
+    debug('promptStreaming', prompt);
     return stream;
   };
 
   public destroy = async () => this.llm.close();
-  public prompt = this.generateText;
-  public execute = this.generateText;
-  public promptStreaming = this.streamText;
-  public executeStreaming = this.streamText;
 }
 
 /**
@@ -75,22 +71,32 @@ export class PolyfillChromeAI implements ChromePromptAPI {
 
   private modelAssetBuffer: Promise<ReadableStreamDefaultReader>;
 
-  private canCreateSession = async (): Promise<ChromeAISessionAvailable> => {
-    // TODO@jeasonstudio:
-    // * if browser do not support WebAssembly/WebGPU, return 'no';
-    // * check if modelAssetBuffer is downloaded, if not, return 'after-download';
-    return 'readily';
+  public canCreateTextSession = async (): Promise<ChromeAISessionAvailable> => {
+    // If browser do not support WebAssembly/WebGPU, return 'no';
+    if (typeof WebAssembly.instantiate !== 'function') return 'no';
+    if (!(<any>navigator).gpu) return 'no';
+
+    // Check if modelAssetBuffer is downloaded, if not, return 'after-download';
+    const isModelAssetBufferReady = await Promise.race([
+      this.modelAssetBuffer,
+      Promise.resolve('sentinel'),
+    ])
+      .then((value) => value === 'sentinel')
+      .catch(() => true);
+
+    return isModelAssetBufferReady ? 'readily' : 'after-download';
   };
-  private defaultSessionOptions =
+
+  public defaultTextSessionOptions =
     async (): Promise<ChromeAISessionOptions> => ({
       temperature: 0.8,
       topK: 3,
     });
 
-  private createSession = async (
+  public createTextSession = async (
     options?: ChromeAISessionOptions
   ): Promise<ChromeAISession> => {
-    const argv = options ?? (await this.defaultSessionOptions());
+    const argv = options ?? (await this.defaultTextSessionOptions());
     const llm = await LlmInference.createFromOptions(
       {
         wasmLoaderPath: this.aiOptions.wasmLoaderPath!,
@@ -108,10 +114,6 @@ export class PolyfillChromeAI implements ChromePromptAPI {
     debug('createSession', options, session);
     return session;
   };
-
-  public canCreateTextSession = this.canCreateSession;
-  public defaultTextSessionOptions = this.defaultSessionOptions;
-  public createTextSession = this.createSession;
 }
 
 export const polyfillChromeAI = (
