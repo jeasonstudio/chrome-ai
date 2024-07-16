@@ -1,8 +1,4 @@
-import {
-  FilesetResolver,
-  LlmInference,
-  ProgressListener,
-} from '@mediapipe/tasks-genai';
+import { LlmInference, ProgressListener } from '@mediapipe/tasks-genai';
 import {
   ChromeAISession,
   ChromeAISessionAvailable,
@@ -60,16 +56,19 @@ class PolyfillChromeAISession implements ChromeAISession {
  */
 export class PolyfillChromeAI implements ChromePromptAPI {
   private aiOptions: PolyfillChromeAIOptions = {
+    wasmBinaryPath:
+      'https://storage.googleapis.com/chrome-ai/genai_wasm_internal.wasm',
+    wasmLoaderPath:
+      'https://storage.googleapis.com/chrome-ai/genai_wasm_internal.js',
     // About 1.78GB, should cache by browser
-    llmModelAssetPath:
-      'https://huggingface.co/oongaboongahacker/Gemini-Nano/resolve/main/weights.bin',
-    filesetBasePath: 'https://unpkg.com/@mediapipe/tasks-genai/wasm/',
+    modelAssetPath:
+      'https://storage.googleapis.com/chrome-ai/gemini-nano-it-chrome-128.bin',
   };
 
   public constructor(aiOptions: Partial<PolyfillChromeAIOptions> = {}) {
     this.aiOptions = Object.assign(this.aiOptions, aiOptions);
     debug('PolyfillChromeAI created', this.aiOptions);
-    this.modelAssetBuffer = fetch(this.aiOptions.llmModelAssetPath).then(
+    this.modelAssetBuffer = fetch(this.aiOptions.modelAssetPath).then(
       (response) => response.body!.getReader()
     )!;
   }
@@ -84,7 +83,7 @@ export class PolyfillChromeAI implements ChromePromptAPI {
   };
   private defaultSessionOptions =
     async (): Promise<ChromeAISessionOptions> => ({
-      temperature: 0.800000011920929,
+      temperature: 0.8,
       topK: 3,
     });
 
@@ -92,21 +91,23 @@ export class PolyfillChromeAI implements ChromePromptAPI {
     options?: ChromeAISessionOptions
   ): Promise<ChromeAISession> => {
     const argv = options ?? (await this.defaultSessionOptions());
-    const fileset = await FilesetResolver.forGenAiTasks(
-      this.aiOptions.filesetBasePath
-    );
-    const llm = await LlmInference.createFromOptions(fileset, {
-      baseOptions: {
-        modelAssetBuffer: await this.modelAssetBuffer,
+    const llm = await LlmInference.createFromOptions(
+      {
+        wasmLoaderPath: this.aiOptions.wasmLoaderPath!,
+        wasmBinaryPath: this.aiOptions.wasmBinaryPath!,
       },
-      temperature: argv.temperature,
-      topK: argv.topK,
-    });
+      {
+        baseOptions: {
+          modelAssetBuffer: await this.modelAssetBuffer,
+        },
+        temperature: argv.temperature,
+        topK: argv.topK,
+      }
+    );
     const session = new PolyfillChromeAISession(llm);
     debug('createSession', options, session);
     return session;
   };
-
 
   public canCreateTextSession = this.canCreateSession;
   public defaultTextSessionOptions = this.defaultSessionOptions;

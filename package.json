@@ -46,8 +46,8 @@
   },
   "dependencies": {
     "@ai-sdk/provider": "^0.0.11",
-    "@mediapipe/tasks-genai": "^0.10.14",
-    "@mediapipe/tasks-text": "^0.10.14",
+    "@mediapipe/tasks-genai": "0.10.14",
+    "@mediapipe/tasks-text": "0.10.14",
     "debug": "^4.3.5"
   },
   "devDependencies": {

@@ -5,9 +5,13 @@ export interface ChromeAIEmbeddingModelSettings {
   /**
    * An optional base path to specify the directory the Wasm files should be loaded from.
    * It's about 6mb before gzip.
-   * @default 'https://unpkg.com/@mediapipe/tasks-text/wasm/'
+   * @default 'https://storage.googleapis.com/chrome-ai/text_wasm_internal.js'
    */
-  filesetBasePath?: string;
+  wasmLoaderPath?: string;
+  /**
+   * @default 'https://storage.googleapis.com/chrome-ai/text_wasm_internal.wasm'
+   */
+  wasmBinaryPath?: string;
   /**
    * The model path to the model asset file.
    * It's about 6.1mb before gzip.
@@ -47,31 +51,42 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
   readonly maxEmbeddingsPerCall = undefined;
 
   private settings: ChromeAIEmbeddingModelSettings = {
-    filesetBasePath: 'https://unpkg.com/@mediapipe/tasks-text/wasm/',
+    wasmLoaderPath:
+      'https://storage.googleapis.com/chrome-ai/text_wasm_internal.js',
+    wasmBinaryPath:
+      'https://storage.googleapis.com/chrome-ai/text_wasm_internal.wasm',
     modelAssetPath:
-      'https://storage.googleapis.com/mediapipe-models/text_embedder/universal_sentence_encoder/float32/1/universal_sentence_encoder.tflite',
+      'https://storage.googleapis.com/chrome-ai/universal_sentence_encoder.tflite',
     l2Normalize: false,
     quantize: false,
   };
+  private modelAssetBuffer!: Promise<ReadableStreamDefaultReader>;
   private textEmbedder: TextEmbedder | null = null;
 
   public constructor(settings: ChromeAIEmbeddingModelSettings = {}) {
     this.settings = { ...this.settings, ...settings };
+    this.modelAssetBuffer = fetch(this.settings.modelAssetPath!).then(
+      (response) => response.body!.getReader()
+    )!;
+    this.getTextEmbedder();
   }
 
   protected getTextEmbedder = async (): Promise<TextEmbedder> => {
     if (this.textEmbedder !== null) return this.textEmbedder;
-    const textFiles = await FilesetResolver.forTextTasks(
-      this.settings.filesetBasePath
-    );
-    this.textEmbedder = await TextEmbedder.createFromOptions(textFiles, {
-      baseOptions: {
-        modelAssetPath: this.settings.modelAssetPath,
-        delegate: this.settings.delegate,
+    this.textEmbedder = await TextEmbedder.createFromOptions(
+      {
+        wasmBinaryPath: this.settings.wasmBinaryPath!,
+        wasmLoaderPath: this.settings.wasmLoaderPath!,
       },
-      l2Normalize: this.settings.l2Normalize,
-      quantize: this.settings.quantize,
-    });
+      {
+        baseOptions: {
+          modelAssetBuffer: await this.modelAssetBuffer,
+          delegate: this.settings.delegate,
+        },
+        l2Normalize: this.settings.l2Normalize,
+        quantize: this.settings.quantize,
+      }
+    );
     return this.textEmbedder;
   };
 

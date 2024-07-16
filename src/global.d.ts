@@ -20,8 +20,9 @@ export interface ChromePromptAPI {
 }
 
 export interface PolyfillChromeAIOptions {
-  llmModelAssetPath: string;
-  filesetBasePath: string;
+  modelAssetPath: string;
+  wasmLoaderPath: string;
+  wasmBinaryPath: string;
 }
 
 declare global {
