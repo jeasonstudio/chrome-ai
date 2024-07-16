@@ -4,14 +4,18 @@ import { TextEmbedder, FilesetResolver } from '@mediapipe/tasks-text';
 export interface ChromeAIEmbeddingModelSettings {
   /**
    * An optional base path to specify the directory the Wasm files should be loaded from.
-   * It's about 6mb before gzip.
-   * @default 'https://unpkg.com/@mediapipe/tasks-text/wasm/'
+   * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.js'
    */
-  filesetBasePath?: string;
+  wasmLoaderPath?: string;
+  /**
+   * It's about 6mb before gzip.
+   * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.wasm'
+   */
+  wasmBinaryPath?: string;
   /**
    * The model path to the model asset file.
    * It's about 6.1mb before gzip.
-   * @default 'https://storage.googleapis.com/mediapipe-models/text_embedder/universal_sentence_encoder/float32/1/universal_sentence_encoder.tflite'
+   * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/universal_sentence_encoder.tflite'
    */
   modelAssetPath?: string;
   /**
@@ -47,32 +51,41 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
   readonly maxEmbeddingsPerCall = undefined;
 
   private settings: ChromeAIEmbeddingModelSettings = {
-    filesetBasePath: 'https://unpkg.com/@mediapipe/tasks-text/wasm/',
+    wasmLoaderPath:
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.js',
+    wasmBinaryPath:
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.wasm',
     modelAssetPath:
-      'https://storage.googleapis.com/mediapipe-models/text_embedder/universal_sentence_encoder/float32/1/universal_sentence_encoder.tflite',
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/universal_sentence_encoder.tflite',
     l2Normalize: false,
     quantize: false,
   };
-  private textEmbedder: TextEmbedder | null = null;
+  private modelAssetBuffer!: Promise<ReadableStreamDefaultReader>;
+  private textEmbedder!: Promise<TextEmbedder>;
 
   public constructor(settings: ChromeAIEmbeddingModelSettings = {}) {
     this.settings = { ...this.settings, ...settings };
+    this.modelAssetBuffer = fetch(this.settings.modelAssetPath!).then(
+      (response) => response.body!.getReader()
+    )!;
+    this.textEmbedder = this.getTextEmbedder();
   }
 
   protected getTextEmbedder = async (): Promise<TextEmbedder> => {
-    if (this.textEmbedder !== null) return this.textEmbedder;
-    const textFiles = await FilesetResolver.forTextTasks(
-      this.settings.filesetBasePath
-    );
-    this.textEmbedder = await TextEmbedder.createFromOptions(textFiles, {
-      baseOptions: {
-        modelAssetPath: this.settings.modelAssetPath,
-        delegate: this.settings.delegate,
+    return TextEmbedder.createFromOptions(
+      {
+        wasmBinaryPath: this.settings.wasmBinaryPath!,
+        wasmLoaderPath: this.settings.wasmLoaderPath!,
       },
-      l2Normalize: this.settings.l2Normalize,
-      quantize: this.settings.quantize,
-    });
-    return this.textEmbedder;
+      {
+        baseOptions: {
+          modelAssetBuffer: await this.modelAssetBuffer,
+          delegate: this.settings.delegate,
+        },
+        l2Normalize: this.settings.l2Normalize,
+        quantize: this.settings.quantize,
+      }
+    );
   };
 
   public doEmbed = async (options: {
@@ -83,7 +96,7 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
     rawResponse?: Record<PropertyKey, any>;
   }> => {
     // if (options.abortSignal) console.warn('abortSignal is not supported');
-    const embedder = await this.getTextEmbedder();
+    const embedder = await this.textEmbedder;
     const embeddings = options.values.map((text) => {
       const embedderResult = embedder.embed(text);
       const [embedding] = embedderResult.embeddings;

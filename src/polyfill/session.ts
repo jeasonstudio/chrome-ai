@@ -1,8 +1,4 @@
-import {
-  FilesetResolver,
-  LlmInference,
-  ProgressListener,
-} from '@mediapipe/tasks-genai';
+import { LlmInference, ProgressListener } from '@mediapipe/tasks-genai';
 import {
   ChromeAISession,
   ChromeAISessionAvailable,
@@ -19,14 +15,14 @@ class PolyfillChromeAISession implements ChromeAISession {
     debug('PolyfillChromeAISession created', llm);
   }
 
-  private generateText = async (prompt: string): Promise<string> => {
+  public prompt = async (prompt: string): Promise<string> => {
     const response = await this.llm.generateResponse(prompt);
-    debug('generateText', prompt, response);
+    debug('prompt', prompt, response);
     return response;
   };
 
-  private streamText = (prompt: string): ReadableStream<string> => {
-    debug('streamText', prompt);
+  public promptStreaming = (prompt: string): ReadableStream<string> => {
+    debug('promptStreaming', prompt);
     const stream = new ReadableStream<string>({
       start: (controller) => {
         const listener: ProgressListener = (
@@ -44,15 +40,11 @@ class PolyfillChromeAISession implements ChromeAISession {
         console.warn('stream text canceled', reason);
       },
     });
-    debug('streamText', prompt);
+    debug('promptStreaming', prompt);
     return stream;
   };
 
   public destroy = async () => this.llm.close();
-  public prompt = this.generateText;
-  public execute = this.generateText;
-  public promptStreaming = this.streamText;
-  public executeStreaming = this.streamText;
 }
 
 /**
@@ -60,57 +52,68 @@ class PolyfillChromeAISession implements ChromeAISession {
  */
 export class PolyfillChromeAI implements ChromePromptAPI {
   private aiOptions: PolyfillChromeAIOptions = {
+    wasmBinaryPath:
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/genai_wasm_internal.wasm',
+    wasmLoaderPath:
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/genai_wasm_internal.js',
     // About 1.78GB, should cache by browser
-    llmModelAssetPath:
-      'https://huggingface.co/oongaboongahacker/Gemini-Nano/resolve/main/weights.bin',
-    filesetBasePath: 'https://unpkg.com/@mediapipe/tasks-genai/wasm/',
+    modelAssetPath:
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/gemini-nano-it-chrome-128.bin',
   };
 
   public constructor(aiOptions: Partial<PolyfillChromeAIOptions> = {}) {
     this.aiOptions = Object.assign(this.aiOptions, aiOptions);
     debug('PolyfillChromeAI created', this.aiOptions);
-    this.modelAssetBuffer = fetch(this.aiOptions.llmModelAssetPath).then(
+    this.modelAssetBuffer = fetch(this.aiOptions.modelAssetPath).then(
       (response) => response.body!.getReader()
     )!;
   }
 
   private modelAssetBuffer: Promise<ReadableStreamDefaultReader>;
 
-  private canCreateSession = async (): Promise<ChromeAISessionAvailable> => {
-    // TODO@jeasonstudio:
-    // * if browser do not support WebAssembly/WebGPU, return 'no';
-    // * check if modelAssetBuffer is downloaded, if not, return 'after-download';
-    return 'readily';
+  public canCreateTextSession = async (): Promise<ChromeAISessionAvailable> => {
+    // If browser do not support WebAssembly/WebGPU, return 'no';
+    if (typeof WebAssembly.instantiate !== 'function') return 'no';
+    if (!(<any>navigator).gpu) return 'no';
+
+    // Check if modelAssetBuffer is downloaded, if not, return 'after-download';
+    const isModelAssetBufferReady = await Promise.race([
+      this.modelAssetBuffer,
+      Promise.resolve('sentinel'),
+    ])
+      .then((value) => value === 'sentinel')
+      .catch(() => true);
+
+    return isModelAssetBufferReady ? 'readily' : 'after-download';
   };
-  private defaultSessionOptions =
+
+  public defaultTextSessionOptions =
     async (): Promise<ChromeAISessionOptions> => ({
-      temperature: 0.800000011920929,
+      temperature: 0.8,
       topK: 3,
     });
 
-  private createSession = async (
+  public createTextSession = async (
     options?: ChromeAISessionOptions
   ): Promise<ChromeAISession> => {
-    const argv = options ?? (await this.defaultSessionOptions());
-    const fileset = await FilesetResolver.forGenAiTasks(
-      this.aiOptions.filesetBasePath
-    );
-    const llm = await LlmInference.createFromOptions(fileset, {
-      baseOptions: {
-        modelAssetBuffer: await this.modelAssetBuffer,
+    const argv = options ?? (await this.defaultTextSessionOptions());
+    const llm = await LlmInference.createFromOptions(
+      {
+        wasmLoaderPath: this.aiOptions.wasmLoaderPath!,
+        wasmBinaryPath: this.aiOptions.wasmBinaryPath!,
       },
-      temperature: argv.temperature,
-      topK: argv.topK,
-    });
+      {
+        baseOptions: {
+          modelAssetBuffer: await this.modelAssetBuffer,
+        },
+        temperature: argv.temperature,
+        topK: argv.topK,
+      }
+    );
     const session = new PolyfillChromeAISession(llm);
     debug('createSession', options, session);
     return session;
   };
-
-
-  public canCreateTextSession = this.canCreateSession;
-  public defaultTextSessionOptions = this.defaultSessionOptions;
-  public createTextSession = this.createSession;
 }
 
 export const polyfillChromeAI = (

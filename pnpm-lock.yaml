@@ -9,10 +9,10 @@ dependencies:
     specifier: ^0.0.11
     version: 0.0.11
   '@mediapipe/tasks-genai':
-    specifier: ^0.10.14
+    specifier: 0.10.14
     version: 0.10.14
   '@mediapipe/tasks-text':
-    specifier: ^0.10.14
+    specifier: 0.10.14
     version: 0.10.14
   debug:
     specifier: ^4.3.5
