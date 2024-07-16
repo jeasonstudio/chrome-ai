@@ -57,12 +57,12 @@ class PolyfillChromeAISession implements ChromeAISession {
 export class PolyfillChromeAI implements ChromePromptAPI {
   private aiOptions: PolyfillChromeAIOptions = {
     wasmBinaryPath:
-      'https://storage.googleapis.com/chrome-ai/genai_wasm_internal.wasm',
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/genai_wasm_internal.wasm',
     wasmLoaderPath:
-      'https://storage.googleapis.com/chrome-ai/genai_wasm_internal.js',
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/genai_wasm_internal.js',
     // About 1.78GB, should cache by browser
     modelAssetPath:
-      'https://storage.googleapis.com/chrome-ai/gemini-nano-it-chrome-128.bin',
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/gemini-nano-it-chrome-128.bin',
   };
 
   public constructor(aiOptions: Partial<PolyfillChromeAIOptions> = {}) {

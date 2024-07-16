@@ -5,17 +5,17 @@ export interface ChromeAIEmbeddingModelSettings {
   /**
    * An optional base path to specify the directory the Wasm files should be loaded from.
    * It's about 6mb before gzip.
-   * @default 'https://storage.googleapis.com/chrome-ai/text_wasm_internal.js'
+   * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.js'
    */
   wasmLoaderPath?: string;
   /**
-   * @default 'https://storage.googleapis.com/chrome-ai/text_wasm_internal.wasm'
+   * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.wasm'
    */
   wasmBinaryPath?: string;
   /**
    * The model path to the model asset file.
    * It's about 6.1mb before gzip.
-   * @default 'https://storage.googleapis.com/mediapipe-models/text_embedder/universal_sentence_encoder/float32/1/universal_sentence_encoder.tflite'
+   * @default 'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/universal_sentence_encoder.tflite'
    */
   modelAssetPath?: string;
   /**
@@ -52,11 +52,11 @@ export class ChromeAIEmbeddingModel implements EmbeddingModelV1<string> {
 
   private settings: ChromeAIEmbeddingModelSettings = {
     wasmLoaderPath:
-      'https://storage.googleapis.com/chrome-ai/text_wasm_internal.js',
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.js',
     wasmBinaryPath:
-      'https://storage.googleapis.com/chrome-ai/text_wasm_internal.wasm',
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/text_wasm_internal.wasm',
     modelAssetPath:
-      'https://storage.googleapis.com/chrome-ai/universal_sentence_encoder.tflite',
+      'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/universal_sentence_encoder.tflite',
     l2Normalize: false,
     quantize: false,
   };
