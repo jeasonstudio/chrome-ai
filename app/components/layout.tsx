@@ -7,7 +7,8 @@ import {
   Github,
   Twitter,
   SquareKanban,
-  FileInput
+  FileInput,
+  FileDiff,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
@@ -102,6 +103,29 @@ export const Layout: React.FC<React.PropsWithChildren<LayoutProps>> = ({
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={5}>
                 Smart Form Playground
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'rounded-lg',
+                    pathname === '/embedding' && 'bg-muted'
+                  )}
+                  aria-label="Embedding Playground"
+                  asChild
+                >
+                  <Link href="/embedding">
+                    <FileDiff className="size-5" />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={5}>
+                Embedding Playground
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
