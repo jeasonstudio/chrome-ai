@@ -1,5 +1,11 @@
 # chrome-ai
 
+## 1.9.1
+
+### Patch Changes
+
+- 6f9ef2d: chore: use mediapipe version 0.10.14 and change model asset cdn url
+
 ## 1.9.0
 
 ### Minor Changes
