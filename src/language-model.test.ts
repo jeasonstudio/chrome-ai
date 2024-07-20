@@ -136,7 +136,7 @@ describe('language-model', () => {
     expect(object).toMatchObject({ hello: "world" });
   });
 
-  it('should do stream json object', async () => {
+  it('should do stream json object when text is in markdown syntax', async () => {
     const promptStreaming = vi.fn((prompt: string) => {
       const stream = new ReadableStream<string>({
         start(controller) {
@@ -164,7 +164,7 @@ describe('language-model', () => {
     }
   });
 
-  it("should do generate object when returned text is in markdown syntax", async () => {
+  it('should do generate object when text is in markdown syntax', async () => {
     const prompt = vi.fn(async () => '```json{"hello":"world"}```');
     vi.stubGlobal("ai", {
       canCreateTextSession: vi.fn(async () => 'readily'),
