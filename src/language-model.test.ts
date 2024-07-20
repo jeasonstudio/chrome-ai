@@ -117,7 +117,7 @@ describe('language-model', () => {
     }
   });
   
-  it("should do generate object", async () => {
+  it('should do generate object', async () => {
     const prompt = vi.fn(async (prompt: string) => '{"hello":"world"}');
     vi.stubGlobal("ai", {
       canCreateTextSession: vi.fn(async () => "readily"),
