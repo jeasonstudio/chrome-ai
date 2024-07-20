@@ -1,5 +1,6 @@
 import { LanguageModelV1StreamPart } from '@ai-sdk/provider';
 import createDebug from 'debug';
+import { extractJSON } from './extract-json';
 
 const debug = createDebug('chromeai');
 
@@ -20,7 +21,8 @@ export class StreamAI extends TransformStream<
         });
       },
       transform: (chunk, controller) => {
-        const textDelta = chunk.replace(textTemp, '');
+        const jsonPart = extractJSON(chunk);
+        const textDelta = jsonPart.replace(textTemp, "");
         textTemp += textDelta;
         controller.enqueue({ type: 'text-delta', textDelta });
       },

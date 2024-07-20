@@ -17,6 +17,7 @@ import {
 import { ChromeAISession, ChromeAISessionOptions } from './global';
 import createDebug from 'debug';
 import { StreamAI } from './stream-ai';
+import { extractJSON } from './extract-json';
 
 const debug = createDebug('chromeai');
 
@@ -185,8 +186,12 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
 
     const session = await this.getSession();
     const message = this.formatMessages(options);
-    const text = await session.prompt(message);
-    debug('generate result:', text);
+
+    const rawText = await session.prompt(message);
+    const text =
+      options.mode.type === "object-json" ? extractJSON(rawText) : rawText;
+
+    debug("generate result:", text);
     return {
       text,
       finishReason: 'stop',

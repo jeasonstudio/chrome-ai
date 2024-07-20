@@ -117,9 +117,56 @@ describe('language-model', () => {
     }
   });
 
-  it('should do generate object', async () => {
-    const prompt = vi.fn(async (prompt: string) => '{"hello":"world"}');
+  it('should do stream json object', async () => {
+    const promptStreaming = vi.fn((prompt: string) => {
+      const stream = new ReadableStream<string>({
+        start(controller) {
+          controller.enqueue('```json{"hello":"world"}```');
+          controller.close();
+        },
+      });
+      return stream;
+    });
     vi.stubGlobal('ai', {
+      canCreateTextSession: vi.fn(async () => 'readily'),
+      defaultTextSessionOptions: vi.fn(async () => ({})),
+      createTextSession: vi.fn(async () => ({ promptStreaming })),
+    });
+
+    const result = await streamObject({
+      model: new ChromeAIChatLanguageModel('text'),
+      schema: z.object({
+        hello: z.string(),
+      }),
+      prompt: 'test',
+    });
+    for await (const textPart of result.textStream) {
+      expect(textPart).toBe('{"hello":"world"}');
+    }
+  });
+
+  it("should do generate object", async () => {
+    const prompt = vi.fn(async (prompt: string) => '{"hello":"world"}');
+    vi.stubGlobal("ai", {
+      canCreateTextSession: vi.fn(async () => "readily"),
+      defaultTextSessionOptions: vi.fn(async () => ({})),
+      createTextSession: vi.fn(async () => ({ prompt })),
+    });
+
+    const { object } = await generateObject({
+      model: new ChromeAIChatLanguageModel('text'),
+      schema: z.object({
+        hello: z.string(),
+      }),
+      prompt: 'test',
+    });
+
+    expect(object).toMatchObject({ hello: "world" });
+  });
+
+  it("should do generate object when returned text is in markdown syntax", async () => {
+    const prompt = vi.fn(async () => '```json{"hello":"world"}```');
+    vi.stubGlobal("ai", {
       canCreateTextSession: vi.fn(async () => 'readily'),
       defaultTextSessionOptions: vi.fn(async () => ({})),
       createTextSession: vi.fn(async () => ({ prompt })),
