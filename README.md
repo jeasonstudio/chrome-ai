@@ -203,7 +203,7 @@ Or you can try using the experimental feature: `chrome-ai/polyfill`, to use `chr
 ```ts
 import 'chrome-ai/polyfill';
 // or
-requre('chrome-ai/polyfill');
+require('chrome-ai/polyfill');
 ```
 
 ## License
