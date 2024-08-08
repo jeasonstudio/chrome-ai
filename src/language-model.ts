@@ -22,10 +22,7 @@ const debug = createDebug('chromeai');
 
 export type ChromeAIChatModelId = 'text';
 
-export interface ChromeAIChatSettings extends Record<string, unknown> {
-  temperature?: number;
-  topK?: number;
-}
+export interface ChromeAIChatSettings extends ChromeAISessionOptions {}
 
 function getStringContent(
   content:
@@ -52,6 +49,9 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   readonly defaultObjectGenerationMode = 'json';
   readonly modelId: ChromeAIChatModelId = 'text';
   readonly provider = 'gemini-nano';
+  readonly supportsImageUrls = false;
+  readonly supportsStructuredOutputs = true;
+
   options: ChromeAIChatSettings;
 
   constructor(
@@ -111,6 +111,10 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
     } else {
       // Use magic prompt for object-json mode
       if (options.mode.type === 'object-json') {
+        prompt.unshift({
+          role: 'system',
+          content: `JSON schema: ${JSON.stringify(options.mode.schema)}`,
+        });
         prompt.unshift({
           role: 'system',
           content: `Throughout our conversation, always start your responses with "{" and end with "}", ensuring the output is a concise JSON object and strictly avoid including any comments, notes, explanations, or examples in your output.\nFor instance, if the JSON schema is {"type":"object","properties":{"someKey":{"type":"string"}},"required":["someKey"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}, your response should immediately begin with "{" and strictly end with "}", following the format: {"someKey": "someValue"}.\nAdhere to this format for all queries moving forward.`,
