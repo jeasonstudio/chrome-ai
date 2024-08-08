@@ -16,7 +16,7 @@ import {
 } from '@ai-sdk/provider';
 import { ChromeAISession, ChromeAISessionOptions } from './global';
 import createDebug from 'debug';
-import { StreamAI } from './stream-ai';
+import { objectStartSequence, objectStopSequence, StreamAI } from './stream-ai';
 
 const debug = createDebug('chromeai');
 
@@ -164,8 +164,15 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
 
     const session = await this.getSession();
     const message = this.formatMessages(options);
-    const text = await session.prompt(message);
+    let text = await session.prompt(message);
+
+    if (options.mode.type === 'object-json') {
+      text = text.replace(new RegExp('^' + objectStartSequence, 'ig'), '');
+      text = text.replace(new RegExp(objectStopSequence + '$', 'ig'), '');
+    }
+
     debug('generate result:', text);
+
     return {
       text,
       finishReason: 'stop',
@@ -193,7 +200,7 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
     const session = await this.getSession();
     const message = this.formatMessages(options);
     const promptStream = session.promptStreaming(message);
-    const transformStream = new StreamAI(options.abortSignal);
+    const transformStream = new StreamAI(options);
     const stream = promptStream.pipeThrough(transformStream);
 
     return {
