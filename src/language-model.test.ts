@@ -181,7 +181,7 @@ describe('language-model', () => {
     await expect(() =>
       generateObject({
         model: new ChromeAIChatLanguageModel('text'),
-        mode: 'grammar',
+        mode: 'tool',
         schema: z.object({}),
         prompt: 'test',
       })
@@ -190,7 +190,7 @@ describe('language-model', () => {
     await expect(() =>
       streamObject({
         model: new ChromeAIChatLanguageModel('text'),
-        mode: 'grammar',
+        mode: 'tool',
         schema: z.object({}),
         prompt: 'test',
       })

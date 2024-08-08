@@ -22,10 +22,7 @@ const debug = createDebug('chromeai');
 
 export type ChromeAIChatModelId = 'text';
 
-export interface ChromeAIChatSettings extends Record<string, unknown> {
-  temperature?: number;
-  topK?: number;
-}
+export interface ChromeAIChatSettings extends ChromeAISessionOptions {}
 
 function getStringContent(
   content:
@@ -52,6 +49,9 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
   readonly defaultObjectGenerationMode = 'json';
   readonly modelId: ChromeAIChatModelId = 'text';
   readonly provider = 'gemini-nano';
+  readonly supportsImageUrls = false;
+  readonly supportsStructuredOutputs = false;
+
   options: ChromeAIChatSettings;
 
   constructor(

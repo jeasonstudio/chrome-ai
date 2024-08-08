@@ -98,7 +98,13 @@ export class PolyfillChromeAI implements ChromePromptAPI {
     options?: ChromeAISessionOptions
   ): Promise<ChromeAISession> => {
     const defaultParams = await this.textModelInfo();
-    const argv = options ?? { temperature: 0.8, topK: 3 };
+    const argv = Object.assign(
+      {
+        temperature: defaultParams.defaultTemperature,
+        topK: defaultParams.defaultTopK,
+      },
+      options
+    );
     const llm = await LlmInference.createFromOptions(
       {
         wasmLoaderPath: this.aiOptions.wasmLoaderPath!,
