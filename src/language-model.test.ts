@@ -56,12 +56,15 @@ describe('language-model', () => {
 
   it('should do generate text', async () => {
     const canCreateSession = vi.fn(async () => 'readily');
-    const getOptions = vi.fn(async () => ({ temperature: 1, topK: 10 }));
+    const getOptions = vi.fn(async () => ({
+      defaultTemperature: 1,
+      defaultTopK: 10,
+    }));
     const prompt = vi.fn(async (prompt: string) => prompt);
     const createSession = vi.fn(async () => ({ prompt }));
     vi.stubGlobal('ai', {
       canCreateTextSession: canCreateSession,
-      defaultTextSessionOptions: getOptions,
+      textModelInfo: getOptions,
       createTextSession: createSession,
     });
 
@@ -104,7 +107,7 @@ describe('language-model', () => {
     });
     vi.stubGlobal('ai', {
       canCreateTextSession: vi.fn(async () => 'readily'),
-      defaultTextSessionOptions: vi.fn(async () => ({})),
+      textModelInfo: vi.fn(async () => ({})),
       createTextSession: vi.fn(async () => ({ promptStreaming })),
     });
 
@@ -121,7 +124,7 @@ describe('language-model', () => {
     const prompt = vi.fn(async (prompt: string) => '{"hello":"world"}');
     vi.stubGlobal('ai', {
       canCreateTextSession: vi.fn(async () => 'readily'),
-      defaultTextSessionOptions: vi.fn(async () => ({})),
+      textModelInfo: vi.fn(async () => ({})),
       createTextSession: vi.fn(async () => ({ prompt })),
     });
 
@@ -140,7 +143,7 @@ describe('language-model', () => {
     const prompt = vi.fn(async (prompt: string) => prompt);
     vi.stubGlobal('ai', {
       canCreateTextSession: vi.fn(async () => 'readily'),
-      defaultTextSessionOptions: vi.fn(async () => ({})),
+      textModelInfo: vi.fn(async () => ({})),
       createTextSession: vi.fn(async () => ({ prompt })),
     });
     await expect(() =>
