@@ -1,6 +1,12 @@
 export type ChromeAISessionAvailable = 'no' | 'after-download' | 'readily';
 
-export interface ChromeAISessionOptions {
+export interface ChromeAIModelInfo {
+  defaultTemperature: number;
+  defaultTopK: number;
+  maxTopK: number;
+}
+
+export interface ChromeAISessionOptions extends Record<string, any> {
   temperature?: number;
   topK?: number;
 }
@@ -13,7 +19,7 @@ export interface ChromeAISession {
 
 export interface ChromePromptAPI {
   canCreateTextSession: () => Promise<ChromeAISessionAvailable>;
-  defaultTextSessionOptions: () => Promise<ChromeAISessionOptions>;
+  textModelInfo: () => Promise<ChromeAIModelInfo>;
   createTextSession: (
     options?: ChromeAISessionOptions
   ) => Promise<ChromeAISession>;

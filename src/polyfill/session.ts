@@ -1,5 +1,6 @@
 import { LlmInference, ProgressListener } from '@mediapipe/tasks-genai';
 import {
+  ChromeAIModelInfo,
   ChromeAISession,
   ChromeAISessionAvailable,
   ChromeAISessionOptions,
@@ -87,16 +88,17 @@ export class PolyfillChromeAI implements ChromePromptAPI {
     return isModelAssetBufferReady ? 'readily' : 'after-download';
   };
 
-  public defaultTextSessionOptions =
-    async (): Promise<ChromeAISessionOptions> => ({
-      temperature: 0.8,
-      topK: 3,
-    });
+  public textModelInfo = async (): Promise<ChromeAIModelInfo> => ({
+    defaultTemperature: 0.8,
+    defaultTopK: 3,
+    maxTopK: 128,
+  });
 
   public createTextSession = async (
     options?: ChromeAISessionOptions
   ): Promise<ChromeAISession> => {
-    const argv = options ?? (await this.defaultTextSessionOptions());
+    const defaultParams = await this.textModelInfo();
+    const argv = options ?? { temperature: 0.8, topK: 3 };
     const llm = await LlmInference.createFromOptions(
       {
         wasmLoaderPath: this.aiOptions.wasmLoaderPath!,
