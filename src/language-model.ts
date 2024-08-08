@@ -113,11 +113,7 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
       if (options.mode.type === 'object-json') {
         prompt.unshift({
           role: 'system',
-          content: `JSON schema: ${JSON.stringify(options.mode.schema)}`,
-        });
-        prompt.unshift({
-          role: 'system',
-          content: `Throughout our conversation, always start your responses with "{" and end with "}", ensuring the output is a concise JSON object and strictly avoid including any comments, notes, explanations, or examples in your output.\nFor instance, if the JSON schema is {"type":"object","properties":{"someKey":{"type":"string"}},"required":["someKey"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}, your response should immediately begin with "{" and strictly end with "}", following the format: {"someKey": "someValue"}.\nAdhere to this format for all queries moving forward.`,
+          content: `Throughout our conversation, always start your responses with "{" and end with "}", ensuring the output is a concise JSON object and strictly avoid including any comments, notes, explanations, or examples in your output.\nFor instance, if the JSON schema is {"type":"object","properties":{"someKey":{"type":"string"}},"required":["someKey"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}, your response should immediately begin with "{" and strictly end with "}", following the format: {"someKey": "someValue"}.\nAdhere to this format for all queries moving forward.\nJSON schema: ${JSON.stringify(options.mode.schema)}`,
         });
       }
 
