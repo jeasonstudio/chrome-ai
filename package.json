@@ -1,9 +1,10 @@
 {
   "name": "chrome-ai",
   "description": "Vercel AI provider for Chrome built-in model (Gemini Nano)",
-  "version": "1.9.1",
+  "version": "1.10.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -30,7 +31,6 @@
     "ui:add": "shadcn-ui add --overwrite",
     "demo": "next dev",
     "lint": "next lint",
-    "prepublishOnly": "npm run build",
     "changeset": "changeset",
     "release:prepare": "npm run lint && npm run test:ci && npm run build",
     "release": "npm run release:prepare && changeset version && changeset publish"
@@ -91,7 +91,7 @@
     "tailwindcss": "^3.4.8",
     "tailwindcss-animate": "^1.0.7",
     "tsup": "^8.2.4",
-    "typescript": "^5.5.4",
+    "typescript": "^5",
     "vaul": "^0.9.1",
     "vercel": "^35.2.3",
     "vitest": "^2.0.5",
