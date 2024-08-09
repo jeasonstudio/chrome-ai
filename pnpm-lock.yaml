@@ -140,7 +140,7 @@ devDependencies:
     specifier: ^8.2.4
     version: 8.2.4(postcss@8.4.41)(typescript@5.5.4)
   typescript:
-    specifier: ^5.5.4
+    specifier: ^5
     version: 5.5.4
   vaul:
     specifier: ^0.9.1
