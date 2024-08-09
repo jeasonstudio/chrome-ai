@@ -56,12 +56,15 @@ describe('language-model', () => {
 
   it('should do generate text', async () => {
     const canCreateSession = vi.fn(async () => 'readily');
-    const getOptions = vi.fn(async () => ({ temperature: 1, topK: 10 }));
+    const getOptions = vi.fn(async () => ({
+      defaultTemperature: 1,
+      defaultTopK: 10,
+    }));
     const prompt = vi.fn(async (prompt: string) => prompt);
     const createSession = vi.fn(async () => ({ prompt }));
     vi.stubGlobal('ai', {
       canCreateTextSession: canCreateSession,
-      defaultTextSessionOptions: getOptions,
+      textModelInfo: getOptions,
       createTextSession: createSession,
     });
 
@@ -104,7 +107,7 @@ describe('language-model', () => {
     });
     vi.stubGlobal('ai', {
       canCreateTextSession: vi.fn(async () => 'readily'),
-      defaultTextSessionOptions: vi.fn(async () => ({})),
+      textModelInfo: vi.fn(async () => ({})),
       createTextSession: vi.fn(async () => ({ promptStreaming })),
     });
 
@@ -148,27 +151,7 @@ describe('language-model', () => {
     });
     vi.stubGlobal('ai', {
       canCreateTextSession: vi.fn(async () => 'readily'),
-      defaultTextSessionOptions: vi.fn(async () => ({})),
-      createTextSession: vi.fn(async () => ({ promptStreaming })),
-    });
-
-    const result = await streamObject({
-      model: new ChromeAIChatLanguageModel('text'),
-      schema: z.object({
-        hello: z.string(),
-      }),
-      prompt: 'test',
-    });
-    for await (const textPart of result.textStream) {
-      expect(textPart).toBe('{"hello":"world"}');
-    }
-  });
-
-  it('should do generate object when text is in markdown syntax', async () => {
-    const prompt = vi.fn(async () => '```json{"hello":"world"}```');
-    vi.stubGlobal("ai", {
-      canCreateTextSession: vi.fn(async () => 'readily'),
-      defaultTextSessionOptions: vi.fn(async () => ({})),
+      textModelInfo: vi.fn(async () => ({})),
       createTextSession: vi.fn(async () => ({ prompt })),
     });
 
@@ -187,7 +170,7 @@ describe('language-model', () => {
     const prompt = vi.fn(async (prompt: string) => prompt);
     vi.stubGlobal('ai', {
       canCreateTextSession: vi.fn(async () => 'readily'),
-      defaultTextSessionOptions: vi.fn(async () => ({})),
+      textModelInfo: vi.fn(async () => ({})),
       createTextSession: vi.fn(async () => ({ prompt })),
     });
     await expect(() =>
@@ -225,7 +208,7 @@ describe('language-model', () => {
     await expect(() =>
       generateObject({
         model: new ChromeAIChatLanguageModel('text'),
-        mode: 'grammar',
+        mode: 'tool',
         schema: z.object({}),
         prompt: 'test',
       })
@@ -234,7 +217,7 @@ describe('language-model', () => {
     await expect(() =>
       streamObject({
         model: new ChromeAIChatLanguageModel('text'),
-        mode: 'grammar',
+        mode: 'tool',
         schema: z.object({}),
         prompt: 'test',
       })

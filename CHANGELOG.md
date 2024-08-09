@@ -1,5 +1,15 @@
 # chrome-ai
 
+## 1.10.0
+
+### Minor Changes
+
+- 70ce881: feat: support vercel ai sdk 3.3 and new chrome prompt api
+
+### Patch Changes
+
+- d1f4727: feat: improve structured output
+
 ## 1.9.1
 
 ### Patch Changes
