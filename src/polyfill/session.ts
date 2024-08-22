@@ -1,19 +1,19 @@
 import { LlmInference, ProgressListener } from '@mediapipe/tasks-genai';
-import {
-  ChromeAIModelInfo,
-  ChromeAISession,
-  ChromeAISessionAvailable,
-  ChromeAISessionOptions,
-  ChromePromptAPI,
+import type {
+  ChromeAIAssistant,
+  ChromeAIAssistantFactory,
+  ChromeAIAssistantCapabilities,
+  ChromeAIAssistantCreateOptions,
   PolyfillChromeAIOptions,
 } from '../global';
+import { ChromeAICapabilityAvailability } from '../enum';
 import createDebug from 'debug';
 
 const debug = createDebug('chromeai:polyfill');
 
-class PolyfillChromeAISession implements ChromeAISession {
+class PolyfillChromeAIAssistant implements ChromeAIAssistant {
   public constructor(private llm: LlmInference) {
-    debug('PolyfillChromeAISession created', llm);
+    debug('PolyfillChromeAIAssistant created', llm);
   }
 
   public prompt = async (prompt: string): Promise<string> => {
@@ -51,7 +51,9 @@ class PolyfillChromeAISession implements ChromeAISession {
 /**
  * Model: https://huggingface.co/oongaboongahacker/Gemini-Nano
  */
-export class PolyfillChromeAI implements ChromePromptAPI {
+export class PolyfillChromeAIAssistantFactory
+  implements ChromeAIAssistantFactory
+{
   private aiOptions: PolyfillChromeAIOptions = {
     wasmBinaryPath:
       'https://pub-ddcfe353995744e89b8002f16bf98575.r2.dev/genai_wasm_internal.wasm',
@@ -72,10 +74,24 @@ export class PolyfillChromeAI implements ChromePromptAPI {
 
   private modelAssetBuffer: Promise<ReadableStreamDefaultReader>;
 
-  public canCreateTextSession = async (): Promise<ChromeAISessionAvailable> => {
+  public capabilities = async (): Promise<ChromeAIAssistantCapabilities> => {
+    const defaultOptions = {
+      defaultTemperature: 0.8,
+      defaultTopK: 3,
+      maxTopK: 128,
+    };
+
     // If browser do not support WebAssembly/WebGPU, return 'no';
-    if (typeof WebAssembly.instantiate !== 'function') return 'no';
-    if (!(<any>navigator).gpu) return 'no';
+    if (typeof WebAssembly.instantiate !== 'function')
+      return {
+        ...defaultOptions,
+        available: ChromeAICapabilityAvailability.NO,
+      };
+    if (!(<any>navigator).gpu)
+      return {
+        ...defaultOptions,
+        available: ChromeAICapabilityAvailability.NO,
+      };
 
     // Check if modelAssetBuffer is downloaded, if not, return 'after-download';
     const isModelAssetBufferReady = await Promise.race([
@@ -85,19 +101,18 @@ export class PolyfillChromeAI implements ChromePromptAPI {
       .then((value) => value === 'sentinel')
       .catch(() => true);
 
-    return isModelAssetBufferReady ? 'readily' : 'after-download';
+    return {
+      ...defaultOptions,
+      available: isModelAssetBufferReady
+        ? ChromeAICapabilityAvailability.READILY
+        : ChromeAICapabilityAvailability.AFTER_DOWNLOAD,
+    };
   };
 
-  public textModelInfo = async (): Promise<ChromeAIModelInfo> => ({
-    defaultTemperature: 0.8,
-    defaultTopK: 3,
-    maxTopK: 128,
-  });
-
-  public createTextSession = async (
-    options?: ChromeAISessionOptions
-  ): Promise<ChromeAISession> => {
-    const defaultParams = await this.textModelInfo();
+  public create = async (
+    options?: ChromeAIAssistantCreateOptions
+  ): Promise<ChromeAIAssistant> => {
+    const defaultParams = await this.capabilities();
     const argv = Object.assign(
       {
         temperature: defaultParams.defaultTemperature,
@@ -118,7 +133,7 @@ export class PolyfillChromeAI implements ChromePromptAPI {
         topK: argv.topK,
       }
     );
-    const session = new PolyfillChromeAISession(llm);
+    const session = new PolyfillChromeAIAssistant(llm);
     debug('createSession', options, session);
     return session;
   };
@@ -127,7 +142,9 @@ export class PolyfillChromeAI implements ChromePromptAPI {
 export const polyfillChromeAI = (
   options?: Partial<PolyfillChromeAIOptions>
 ) => {
-  const ai = new PolyfillChromeAI(options);
+  const ai = {
+    assistant: new PolyfillChromeAIAssistantFactory(options),
+  };
   globalThis.ai = globalThis.ai || ai;
   globalThis.model = globalThis.model || ai;
 };

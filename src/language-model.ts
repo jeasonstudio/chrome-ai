@@ -14,7 +14,11 @@ import {
   LoadSettingError,
   UnsupportedFunctionalityError,
 } from '@ai-sdk/provider';
-import { ChromeAISession, ChromeAISessionOptions } from './global';
+import type {
+  ChromeAIAssistant,
+  ChromeAIAssistantCreateOptions,
+} from './global';
+import { ChromeAICapabilityAvailability } from './enum';
 import createDebug from 'debug';
 import { objectStartSequence, objectStopSequence, StreamAI } from './stream-ai';
 
@@ -22,7 +26,7 @@ const debug = createDebug('chromeai');
 
 export type ChromeAIChatModelId = 'text';
 
-export interface ChromeAIChatSettings extends ChromeAISessionOptions {}
+export interface ChromeAIChatSettings extends ChromeAIAssistantCreateOptions {}
 
 function getStringContent(
   content:
@@ -63,31 +67,29 @@ export class ChromeAIChatLanguageModel implements LanguageModelV1 {
     debug('init:', this.modelId);
   }
 
-  private session!: ChromeAISession;
+  private session!: ChromeAIAssistant;
   private getSession = async (
-    options?: ChromeAISessionOptions
-  ): Promise<ChromeAISession> => {
-    if (!globalThis.ai?.canCreateTextSession) {
+    options?: ChromeAIAssistantCreateOptions
+  ): Promise<ChromeAIAssistant> => {
+    if (!globalThis.ai?.assistant) {
       throw new LoadSettingError({ message: 'Browser not support' });
     }
-
-    const available = await ai.canCreateTextSession();
-
     if (this.session) return this.session;
 
-    if (available !== 'readily') {
+    const cap = await ai.assistant.capabilities();
+
+    if (cap.available !== ChromeAICapabilityAvailability.READILY) {
       throw new LoadSettingError({ message: 'Built-in model not ready' });
     }
 
-    const defaultOptions = await ai.textModelInfo();
     this.options = {
-      temperature: defaultOptions.defaultTemperature,
-      topK: defaultOptions.defaultTopK,
+      temperature: cap.defaultTemperature,
+      topK: cap.defaultTopK,
       ...this.options,
       ...options,
     };
 
-    this.session = await ai.createTextSession(this.options);
+    this.session = await ai.assistant.create(this.options);
 
     debug('session created:', this.session, this.options);
     return this.session;

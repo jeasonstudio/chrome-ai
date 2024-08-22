@@ -32,9 +32,11 @@ describe('language-model', () => {
       })
     ).rejects.toThrowError(LoadSettingError);
 
-    const cannotCreateSession = vi.fn(async () => 'no');
+    const capabilities = vi.fn(async () => 'no');
     vi.stubGlobal('ai', {
-      canCreateTextSession: cannotCreateSession,
+      assistant: {
+        capabilities,
+      },
     });
 
     await expect(() =>
@@ -43,7 +45,7 @@ describe('language-model', () => {
         prompt: 'empty',
       })
     ).rejects.toThrowError(LoadSettingError);
-    expect(cannotCreateSession).toHaveBeenCalledTimes(1);
+    expect(capabilities).toHaveBeenCalledTimes(1);
 
     await expect(() =>
       generateText({
@@ -51,28 +53,29 @@ describe('language-model', () => {
         prompt: 'empty',
       })
     ).rejects.toThrowError(LoadSettingError);
-    expect(cannotCreateSession).toHaveBeenCalledTimes(2);
+    expect(capabilities).toHaveBeenCalledTimes(2);
   });
 
   it('should do generate text', async () => {
-    const canCreateSession = vi.fn(async () => 'readily');
-    const getOptions = vi.fn(async () => ({
+    const capabilities = vi.fn(async () => ({
       defaultTemperature: 1,
       defaultTopK: 10,
+      maxTopK: 128,
+      available: 'readily',
     }));
     const prompt = vi.fn(async (prompt: string) => prompt);
-    const createSession = vi.fn(async () => ({ prompt }));
+    const create = vi.fn(async () => ({ prompt }));
     vi.stubGlobal('ai', {
-      canCreateTextSession: canCreateSession,
-      textModelInfo: getOptions,
-      createTextSession: createSession,
+      assistant: {
+        capabilities,
+        create,
+      },
     });
 
     await generateText({
       model: new ChromeAIChatLanguageModel('text'),
       prompt: 'test',
     });
-    expect(getOptions).toHaveBeenCalledTimes(1);
 
     const result = await generateText({
       model: new ChromeAIChatLanguageModel('text'),
@@ -105,10 +108,17 @@ describe('language-model', () => {
       });
       return stream;
     });
+
     vi.stubGlobal('ai', {
-      canCreateTextSession: vi.fn(async () => 'readily'),
-      textModelInfo: vi.fn(async () => ({})),
-      createTextSession: vi.fn(async () => ({ promptStreaming })),
+      assistant: {
+        capabilities: vi.fn(async () => ({
+          defaultTemperature: 1,
+          defaultTopK: 10,
+          maxTopK: 128,
+          available: 'readily',
+        })),
+        create: vi.fn(async () => ({ promptStreaming })),
+      },
     });
 
     const result = await streamText({
@@ -123,9 +133,15 @@ describe('language-model', () => {
   it('should do generate object', async () => {
     const prompt = vi.fn(async (prompt: string) => '{"hello":"world"}');
     vi.stubGlobal('ai', {
-      canCreateTextSession: vi.fn(async () => 'readily'),
-      textModelInfo: vi.fn(async () => ({})),
-      createTextSession: vi.fn(async () => ({ prompt })),
+      assistant: {
+        capabilities: vi.fn(async () => ({
+          defaultTemperature: 1,
+          defaultTopK: 10,
+          maxTopK: 128,
+          available: 'readily',
+        })),
+        create: vi.fn(async () => ({ prompt })),
+      },
     });
 
     const { object } = await generateObject({
@@ -142,9 +158,15 @@ describe('language-model', () => {
   it('should throw when tool call', async () => {
     const prompt = vi.fn(async (prompt: string) => prompt);
     vi.stubGlobal('ai', {
-      canCreateTextSession: vi.fn(async () => 'readily'),
-      textModelInfo: vi.fn(async () => ({})),
-      createTextSession: vi.fn(async () => ({ prompt })),
+      assistant: {
+        capabilities: vi.fn(async () => ({
+          defaultTemperature: 1,
+          defaultTopK: 10,
+          maxTopK: 128,
+          available: 'readily',
+        })),
+        create: vi.fn(async () => ({ prompt })),
+      },
     });
     await expect(() =>
       generateText({

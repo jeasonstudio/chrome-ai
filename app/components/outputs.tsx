@@ -24,10 +24,10 @@ export const Outputs = React.forwardRef<
     const version = getChromeVersion();
     // setIsBrowserSupport(version >= 127);
 
-    setIsEnabledFlags(!!('ai' in globalThis));
+    setIsEnabledFlags(!!globalThis.ai?.assistant);
 
-    globalThis.ai?.canCreateTextSession().then((status) => {
-      setIsEnabledFlags(status === 'readily');
+    globalThis.ai?.assistant.capabilities().then((cap) => {
+      setIsEnabledFlags(cap.available === 'readily');
     });
   }, []);
 

@@ -1,5 +1,5 @@
 import { EmbeddingModelV1, EmbeddingModelV1Embedding } from '@ai-sdk/provider';
-import { TextEmbedder, FilesetResolver } from '@mediapipe/tasks-text';
+import { TextEmbedder } from '@mediapipe/tasks-text';
 
 export interface ChromeAIEmbeddingModelSettings {
   /**
