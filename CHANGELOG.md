@@ -1,5 +1,11 @@
 # chrome-ai
 
+## 1.11.0
+
+### Minor Changes
+
+- 4752a95: feat: update the api of chrome built-in ai
+
 ## 1.10.0
 
 ### Minor Changes
