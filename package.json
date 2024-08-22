@@ -45,7 +45,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@ai-sdk/provider": "^0.0.16",
+    "@ai-sdk/provider": "^0.0.21",
     "@mediapipe/tasks-genai": "0.10.14",
     "@mediapipe/tasks-text": "0.10.14",
     "debug": "^4.3.6"

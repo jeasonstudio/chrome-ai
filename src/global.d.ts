@@ -1,28 +1,34 @@
-export type ChromeAISessionAvailable = 'no' | 'after-download' | 'readily';
+// https://github.com/explainers-by-googlers/prompt-api
 
-export interface ChromeAIModelInfo {
+import { ChromeAICapabilityAvailability } from './enum';
+
+export interface ChromeAIAssistantCapabilities {
+  available: ChromeAICapabilityAvailability;
   defaultTemperature: number;
   defaultTopK: number;
   maxTopK: number;
 }
 
-export interface ChromeAISessionOptions extends Record<string, any> {
+export interface ChromeAIAssistantCreateOptions extends Record<string, any> {
   temperature?: number;
   topK?: number;
 }
 
-export interface ChromeAISession {
+export interface ChromeAIAssistant {
   destroy: () => Promise<void>;
   prompt: (prompt: string) => Promise<string>;
   promptStreaming: (prompt: string) => ReadableStream<string>;
 }
 
-export interface ChromePromptAPI {
-  canCreateTextSession: () => Promise<ChromeAISessionAvailable>;
-  textModelInfo: () => Promise<ChromeAIModelInfo>;
-  createTextSession: (
-    options?: ChromeAISessionOptions
-  ) => Promise<ChromeAISession>;
+export interface ChromeAIAssistantFactory {
+  capabilities: () => Promise<ChromeAIAssistantCapabilities>;
+  create: (
+    options?: ChromeAIAssistantCreateOptions
+  ) => Promise<ChromeAIAssistant>;
+}
+
+export interface ChromePromptAPI extends Record<string, any> {
+  assistant: ChromeAIAssistantFactory;
 }
 
 export interface PolyfillChromeAIOptions {
