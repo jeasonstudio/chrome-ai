@@ -21,17 +21,19 @@ export function chromeai(
   settings?: ChromeAIChatSettings
 ): ChromeAIChatLanguageModel;
 export function chromeai(
-  modelId?: 'embedding',
+  modelId: 'embedding',
   settings?: ChromeAIEmbeddingModelSettings
 ): ChromeAIEmbeddingModel;
-export function chromeai(modelId: string = 'text', settings: any = {}) {
+export function chromeai(modelId: unknown = 'text', settings: unknown = {}) {
   debug('create instance', modelId, settings);
   if (modelId === 'embedding') {
-    return new ChromeAIEmbeddingModel(settings);
+    return new ChromeAIEmbeddingModel(
+      settings as ChromeAIEmbeddingModelSettings
+    );
   }
   return new ChromeAIChatLanguageModel(
     modelId as ChromeAIChatModelId,
-    settings
+    settings as ChromeAIChatSettings
   );
 }
 
