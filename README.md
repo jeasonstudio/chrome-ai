@@ -206,6 +206,10 @@ import 'chrome-ai/polyfill';
 require('chrome-ai/polyfill');
 ```
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=jeasonstudio/chrome-ai&type=Date)](https://star-history.com/#jeasonstudio/chrome-ai&Date)
+
 ## License
 
 [MIT](LICENSE) License © 2024 [Jeason](https://github.com/jeasonstudio)
