@@ -1,5 +1,11 @@
 # chrome-ai
 
+## 1.11.1
+
+### Patch Changes
+
+- fix: type definition of language model v1
+
 ## 1.11.0
 
 ### Minor Changes
