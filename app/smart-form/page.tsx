@@ -28,6 +28,7 @@ import { useToast } from '../components/ui/use-toast';
 import { Textarea } from '../components/ui/textarea';
 import { Toaster } from '../components/ui/toaster';
 import { LoaderCircle, ClipboardPaste } from 'lucide-react';
+import { useAIModel, AIModelProvider } from 'use-ai-lib';
 
 const schema = z.object({
   name: z.string({ description: 'Name' }),
@@ -44,7 +45,7 @@ Please let me know once the update has been completed. Thank you for your assist
 Best regards,
 Jeason`;
 
-const SmartFormPage: React.FC<unknown> = () => {
+const SmartForm: React.FC<unknown> = () => {
   const [emailContent, setEmailContent] = React.useState(defaultEmailContent);
   const { toast } = useToast();
 
@@ -74,7 +75,19 @@ const SmartFormPage: React.FC<unknown> = () => {
     content: '',
   });
   const model = useSettingsModel(settingsForm);
-  const [loading, setLoading] = React.useState(false);
+
+  const [messages, setMessages] = React.useState<CoreMessage[]>([]); 
+
+  const { isGenerating } = useAIModel(model, {
+    schema,
+    messages,
+    stream: true,
+    onSuccess: (chunk) => {
+      console.log(chunk);
+      form.reset(chunk);
+    }
+  });
+
   const onGenerate = async () => {
     const content = await navigator.clipboard.readText();
 
@@ -94,26 +107,7 @@ const SmartFormPage: React.FC<unknown> = () => {
 
     const messages = [systemMessage, userMessage];
 
-    try {
-      setLoading(true);
-      const startTimestamp = Date.now();
-      const { partialObjectStream } = await streamObject({
-        model,
-        schema,
-        messages,
-      });
-      for await (const partialObject of partialObjectStream) {
-        console.log(partialObject);
-        form.reset(partialObject);
-      }
-      setLoading(false);
-      const cost = Date.now() - startTimestamp;
-      console.log('cost:', cost, 'ms');
-    } catch (error) {
-      console.warn(error);
-    } finally {
-      setLoading(false);
-    }
+    setMessages(messages);
   };
 
   return (
@@ -201,10 +195,10 @@ const SmartFormPage: React.FC<unknown> = () => {
                     Submit
                   </Button>
 
-                  {loading ? (
+                  {isGenerating ? (
                     <Button
                       className="ml-auto"
-                      disabled={loading}
+                      disabled={isGenerating}
                       type="button"
                     >
                       <LoaderCircle className="animate-spin size-3.5 mr-1" />{' '}
@@ -215,7 +209,7 @@ const SmartFormPage: React.FC<unknown> = () => {
                       type="button"
                       className="ml-auto"
                       onClick={onGenerate}
-                      disabled={loading}
+                      disabled={isGenerating}
                     >
                       <ClipboardPaste className="size-3.5 mr-1" /> Paste with AI
                     </Button>
@@ -229,5 +223,11 @@ const SmartFormPage: React.FC<unknown> = () => {
     </Layout>
   );
 };
+
+const SmartFormPage = () => {
+  return <AIModelProvider>
+    <SmartForm />
+  </AIModelProvider>
+}
 
 export default SmartFormPage;
