@@ -81,7 +81,6 @@ const SmartForm: React.FC<unknown> = () => {
   const { isGenerating } = useAIModel(model, {
     schema,
     messages,
-    stream: true,
     onSuccess: (chunk) => {
       console.log(chunk);
       form.reset(chunk);
