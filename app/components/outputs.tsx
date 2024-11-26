@@ -5,8 +5,9 @@ import { cn } from '../utils';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { ChromeAIAssistantCapabilities } from '@/src/global';
 
-export interface OutputsProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface OutputsProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export const Outputs = React.forwardRef<
   HTMLDivElement,
@@ -24,9 +25,10 @@ export const Outputs = React.forwardRef<
     const version = getChromeVersion();
     // setIsBrowserSupport(version >= 127);
 
-    setIsEnabledFlags(!!globalThis.ai?.assistant);
+    setIsEnabledFlags(!!globalThis.ai?.languageModel);
 
-    globalThis.ai?.assistant.capabilities().then((cap) => {
+    globalThis.ai?.languageModel.capabilities().then((cap: ChromeAIAssistantCapabilities) => {
+
       setIsEnabledFlags(cap.available === 'readily');
     });
   }, []);

@@ -3,9 +3,21 @@
 import { ChromeAICapabilityAvailability } from './enum';
 
 export interface ChromeAIAssistantCapabilities {
+  /**
+   * the availability of the capability
+   */
   available: ChromeAICapabilityAvailability;
+  /**
+   * the default temperature for the capability
+   */
   defaultTemperature: number;
+  /**
+   * the default top k for the capability
+   */
   defaultTopK: number;
+  /**
+   * the maximum top k for the capability
+   */
   maxTopK: number;
 }
 
